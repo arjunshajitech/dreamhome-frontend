@@ -1,0 +1,32 @@
+
+.admin-header-container {
+    .p-menubar-root-list {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+}
+
+.admin-login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 100px;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+.login-text {
+    font-size: 25px;
+    color: #10b981;
+}
+
+.create-account {
+    text-decoration: none;
+    color: #334155;
+}
+
+.create-account:hover {
+    color: #10b981;
+    transition: .5s;
+}
