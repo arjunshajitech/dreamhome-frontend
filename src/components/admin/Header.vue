@@ -2,6 +2,9 @@
 import { ref } from "vue";
 import { useToast } from "primevue/usetoast";
 const toast = useToast();
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const showSuccess = () => {
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Logout Success.', group: 'br', life: 3000 });
@@ -9,6 +12,7 @@ const showSuccess = () => {
 
 const adminLogout = () => {
     showSuccess();
+    router.push('/admin')
 }
 
 const items = ref([
@@ -20,7 +24,7 @@ const items = ref([
         label: 'Logout',
         icon: 'pi pi-sign-out',
         command: () => {
-            showSuccess();
+            adminLogout();
         }
 
     }
