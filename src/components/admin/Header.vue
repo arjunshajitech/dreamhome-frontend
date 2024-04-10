@@ -1,10 +1,13 @@
 <script setup>
 import { ref } from "vue";
 import { useToast } from "primevue/usetoast";
-const toast = useToast();
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
+axios.defaults.withCredentials = true;
 const router = useRouter();
+const toast = useToast();
+
 
 const showSuccess = () => {
     toast.add({ severity: 'success', summary: 'Success Message', detail: 'Logout Success.', group: 'br', life: 3000 });
@@ -18,7 +21,7 @@ const adminLogout = () => {
 const items = ref([
     {
         label: 'Dream Home',
-        icon: 'pi pi-home'
+        icon: 'pi pi-home',
     },
     {
         label: 'Admin Dashboard',

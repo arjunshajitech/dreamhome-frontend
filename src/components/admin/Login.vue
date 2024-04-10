@@ -1,39 +1,41 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useToast } from "primevue/usetoast";
-const toast = useToast();
 import { useRouter } from 'vue-router';
+import axios from 'axios';
+import constants from '../../constant/const'
 
+axios.defaults.withCredentials = true;
 const router = useRouter();
+const toast = useToast();
 
-const showSuccess = () => {
-    toast.add({ severity: 'success', summary: 'Success Message', detail: 'Login Success.', group: 'br', life: 3000 });
-};
+const adminLoginRequest = {
+    email: 'admin@admin.com',
+    password: '123456'
+}
 
-const showInfo = () => {
-    toast.add({ severity: 'info', summary: 'Info Message', detail: 'Message Content', life: 3000 });
-};
-
-const showWarn = () => {
-    toast.add({ severity: 'warn', summary: 'Warn Message', detail: 'Message Content', life: 3000 });
-};
-
-const showError = () => {
-    toast.add({ severity: 'error', summary: 'Error Message', detail: 'Message Content', life: 3000 });
-};
-
-const showSecondary = () => {
-    toast.add({ severity: 'secondary', summary: 'Secondary Message', detail: 'Message Content', life: 3000 });
-};
-
-const showContrast = () => {
-    toast.add({ severity: 'contrast', summary: 'Contrast Message', detail: 'Message Content', life: 3000 });
-};
-
+onMounted(() => {
+    axios.post(constants.ADMIN_LOGOUT).then(() => { }).catch((error) => { console.error(error) });
+})
 
 const adminLogin = () => {
-    router.push('/admin/home');
-};
+    axios.post(constants.ADMIN_LOGIN, adminLoginRequest).then((response) => {
+        console.log(adminLoginRequest.email);
+        console.log(adminLoginRequest.password);
+        if (response.status === 200) {
+            toast.add({ severity: 'success', summary: 'Success Message', detail: 'Login Success.', group: 'br', life: 3000 });
+            setTimeout(() => {
+                router.push('/admin/home');
+            }, 500);
+        } else {
+        }
+
+    }).catch((error) => {
+        toast.add({ severity: 'error', summary: 'Error Message', detail: 'Bad Credentails.', group: 'br', life: 3000 });
+        router.push('/admin');
+        console.error(error);
+    });
+}
 
 </script>
 
@@ -43,15 +45,14 @@ const adminLogin = () => {
         <p class="login-text">Welcome Back!</p>
         <IconField iconPosition="left">
             <InputIcon class="pi pi-envelope"> </InputIcon>
-            <InputText v-model="value1" placeholder="Email" type="email" />
+            <InputText v-model="adminLoginRequest.email" placeholder="Email" type="email" />
         </IconField>
         <IconField iconPosition="left">
             <InputIcon class="pi pi-key"> </InputIcon>
-            <InputText v-model="value1" placeholder="Password" type="password" />
+            <InputText v-model="adminLoginRequest.password" placeholder="Password" type="password" />
         </IconField>
-        <!-- <a href="" class="create-account">Create an account ?</a> -->
         <div class="card flex justify-content-center">
-            <Button type="button" label="Continue"  @click="adminLogin()" />
+            <Button type="button" label="Continue" @click="adminLogin()" />
         </div>
         <Toast />
     </div>
