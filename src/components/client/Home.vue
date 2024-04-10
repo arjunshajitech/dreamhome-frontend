@@ -6,51 +6,11 @@ import { useToast } from "primevue/usetoast";
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-
 const customers = ref();
 const loading = ref(true);
 const confirm = useConfirm();
 const toast = useToast();
-
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    email: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    phone: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-    yearofexpirence: { value: null, matchMode: FilterMatchMode.EQUALS },
-    jobtitle: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
-});
-
-const selectedCity = ref();
-const cities = ref([
-    { name: 'New York', code: 'NY' },
-    { name: 'Rome', code: 'RM' },
-    { name: 'London', code: 'LDN' },
-    { name: 'Istanbul', code: 'IST' },
-    { name: 'Paris', code: 'PRS' }
-]);
-
 const dataTable = ref('projects')
-const expandedRowGroups = ref();
-const onRowGroupExpand = (event) => {
-    toast.add({ severity: 'info', summary: 'Row Group Expanded', detail: 'Value: ' + event.data, life: 3000 });
-};
-const onRowGroupCollapse = (event) => {
-    toast.add({ severity: 'success', summary: 'Row Group Collapsed', detail: 'Value: ' + event.data, life: 3000 });
-};
-const calculateCustomerTotal = (name) => {
-    let total = 0;
-
-    if (customers.value) {
-        for (let customer of customers.value) {
-            if (customer.representative.name === name) {
-                total++;
-            }
-        }
-    }
-
-    return total;
-};
 const dt = ref();
 const products = ref();
 const productDialog = ref(false);
@@ -68,6 +28,23 @@ const statuses = ref([
     { label: 'OUTOFSTOCK', value: 'outofstock' }
 ]);
 
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    email: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    phone: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    yearofexpirence: { value: null, matchMode: FilterMatchMode.EQUALS },
+    jobtitle: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
+});
+
+const cities = ref([
+    { name: 'New York', code: 'NY' },
+    { name: 'Rome', code: 'RM' },
+    { name: 'London', code: 'LDN' },
+    { name: 'Istanbul', code: 'IST' },
+    { name: 'Paris', code: 'PRS' }
+]);
+
 const details = [
     {
         id: '1000',
@@ -82,8 +59,6 @@ const details = [
         rating: 5
     }
 ]
-
-
 
 const formatCurrency = (value) => {
     if (value)
@@ -157,9 +132,8 @@ const createId = () => {
 const exportCSV = () => {
     dt.value.exportCSV();
 };
-const confirmDeleteSelected = () => {
-    deleteProductsDialog.value = true;
-};
+
+
 const deleteSelectedProducts = () => {
     products.value = products.value.filter(val => !selectedProducts.value.includes(val));
     deleteProductsDialog.value = false;
@@ -324,15 +298,6 @@ const confirm2 = () => {
             <Menu :model="items" class="w-full md:w-15rem">
                 <template #start>
                     <span class="inline-flex align-items-center gap-1 px-2 py-2">
-                        <svg width="35" height="40" viewBox="0 0 35 40" fill="none" xmlns="http://www.w3.org/2000/svg"
-                            class="h-2rem">
-                            <path
-                                d="M25.87 18.05L23.16 17.45L25.27 20.46V29.78L32.49 23.76V13.53L29.18 14.73L25.87 18.04V18.05ZM25.27 35.49L29.18 31.58V27.67L25.27 30.98V35.49ZM20.16 17.14H20.03H20.17H20.16ZM30.1 5.19L34.89 4.81L33.08 12.33L24.1 15.67L30.08 5.2L30.1 5.19ZM5.72 14.74L2.41 13.54V23.77L9.63 29.79V20.47L11.74 17.46L9.03 18.06L5.72 14.75V14.74ZM9.63 30.98L5.72 27.67V31.58L9.63 35.49V30.98ZM4.8 5.2L10.78 15.67L1.81 12.33L0 4.81L4.79 5.19L4.8 5.2ZM24.37 21.05V34.59L22.56 37.29L20.46 39.4H14.44L12.34 37.29L10.53 34.59V21.05L12.42 18.23L17.45 26.8L22.48 18.23L24.37 21.05ZM22.85 0L22.57 0.69L17.45 13.08L12.33 0.69L12.05 0H22.85Z"
-                                fill="var(--primary-color)" />
-                            <path
-                                d="M30.69 4.21L24.37 4.81L22.57 0.69L22.86 0H26.48L30.69 4.21ZM23.75 5.67L22.66 3.08L18.05 14.24V17.14H19.7H20.03H20.16H20.2L24.1 15.7L30.11 5.19L23.75 5.67ZM4.21002 4.21L10.53 4.81L12.33 0.69L12.05 0H8.43002L4.22002 4.21H4.21002ZM21.9 17.4L20.6 18.2H14.3L13 17.4L12.4 18.2L12.42 18.23L17.45 26.8L22.48 18.23L22.5 18.2L21.9 17.4ZM4.79002 5.19L10.8 15.7L14.7 17.14H14.74H15.2H16.85V14.24L12.24 3.09L11.15 5.68L4.79002 5.2V5.19Z"
-                                fill="var(--text-color)" />
-                        </svg>
                         <span class="font-medium text-xl font-semibold">DREAM<span class="text-primary">
                                 HOME</span></span>
                     </span>
@@ -354,9 +319,7 @@ const confirm2 = () => {
         </div>
 
         <div class="list-projects">
-
             <div v-if="dataTable === 'plans'" class="engineer-data-table">
-
                 <div class="card">
                     <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id"
                         :paginator="true" :rows="10" :filters="filterss"
@@ -377,16 +340,11 @@ const confirm2 = () => {
                         <Column field="code" header="Project Name" sortable style="min-width:12rem"></Column>
                         <Column field="name" header="Plan Price" sortable style="min-width:16rem"></Column>
                         <Column header="Plan Image">
-                                <template #body="slotProps">
-                                    <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`" :alt="slotProps.data.image" class="border-round" style="width: 250px" />
-                                </template>
-                            </Column>
-                        <!-- <Column field="inventoryStatus" header="Plan Payment" sortable style="min-width:12rem">
                             <template #body="slotProps">
-                                <Tag :value="slotProps.data.inventoryStatus"
-                                    :severity="getStatusLabel(slotProps.data.inventoryStatus)" />
+                                <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`"
+                                    :alt="slotProps.data.image" class="border-round" style="width: 250px" />
                             </template>
-                        </Column> -->
+                        </Column>
                         <Column field="accept" header="Accept" style="min-width: 12rem">
                             <template #body="{ data }">
                                 <Button @click="confirm1()" label="Accept" outlined></Button>
@@ -401,7 +359,7 @@ const confirm2 = () => {
                 </div>
             </div>
 
-            <div v-else-if="dataTable === 'models' " class="models">
+            <div v-else-if="dataTable === 'models'" class="models">
                 <div class="card">
                     <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id"
                         :paginator="true" :rows="10" :filters="filterss"
@@ -421,17 +379,12 @@ const confirm2 = () => {
                         </template>
                         <Column field="code" header="Project Name" sortable style="min-width:12rem"></Column>
                         <Column field="name" header="Plan Price" sortable style="min-width:16rem"></Column>
-                        <Column header="Plan Image">
-                                <template #body="slotProps">
-                                    <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`" :alt="slotProps.data.image" class="border-round" style="width: 250px" />
-                                </template>
-                            </Column>
-                        <!-- <Column field="inventoryStatus" header="Plan Payment" sortable style="min-width:12rem">
+                        <Column header="3D Model Image">
                             <template #body="slotProps">
-                                <Tag :value="slotProps.data.inventoryStatus"
-                                    :severity="getStatusLabel(slotProps.data.inventoryStatus)" />
+                                <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`"
+                                    :alt="slotProps.data.image" class="border-round" style="width: 250px" />
                             </template>
-                        </Column> -->
+                        </Column>
                         <Column field="accept" header="Accept" style="min-width: 12rem">
                             <template #body="{ data }">
                                 <Button @click="confirm1()" label="Accept" outlined></Button>
@@ -459,7 +412,6 @@ const confirm2 = () => {
                                 <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" />
                             </template>
                         </Toolbar>
-
                         <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id"
                             :paginator="true" :rows="10" :filters="filterss"
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -476,26 +428,14 @@ const confirm2 = () => {
                                     </IconField>
                                 </div>
                             </template>
-
-                            <!-- <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column> -->
                             <Column field="code" header="Name" sortable style="min-width:12rem"></Column>
                             <Column field="name" header="Type" sortable style="min-width:16rem"></Column>
-                            <!-- <Column header="Image">
-                                <template #body="slotProps">
-                                    <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`" :alt="slotProps.data.image" class="border-round" style="width: 64px" />
-                                </template>
-                            </Column> -->
                             <Column field="price" header="Architecture Sytle" sortable style="min-width:8rem">
                                 <template #body="slotProps">
                                     {{ formatCurrency(slotProps.data.price) }}
                                 </template>
                             </Column>
                             <Column field="category" header="Timeline" sortable style="min-width:10rem"></Column>
-                            <!-- <Column field="rating" header="Reviews" sortable style="min-width:12rem">
-                                <template #body="slotProps">
-                                    <Rating :modelValue="slotProps.data.rating" :readonly="true" :cancel="false" />
-                                </template>
-                            </Column> -->
                             <Column field="inventoryStatus" header="Plan Payment" sortable style="min-width:12rem">
                                 <template #body="slotProps">
                                     <Tag :value="slotProps.data.inventoryStatus"
@@ -580,39 +520,6 @@ const confirm2 = () => {
                                 :invalid="submitted && !product.name" />
                             <small class="p-error" v-if="submitted && !product.name">Name is required.</small>
                         </div>
-
-                        <!-- <div class="field">
-                            <label class="mb-3">Category</label>
-                            <div class="formgrid grid">
-                                <div class="field-radiobutton col-6">
-                                    <RadioButton id="category1" name="category" value="Accessories" v-model="product.category" />
-                                    <label for="category1">Accessories</label>
-                                </div>
-                                <div class="field-radiobutton col-6">
-                                    <RadioButton id="category2" name="category" value="Clothing" v-model="product.category" />
-                                    <label for="category2">Clothing</label>
-                                </div>
-                                <div class="field-radiobutton col-6">
-                                    <RadioButton id="category3" name="category" value="Electronics" v-model="product.category" />
-                                    <label for="category3">Electronics</label>
-                                </div>
-                                <div class="field-radiobutton col-6">
-                                    <RadioButton id="category4" name="category" value="Fitness" v-model="product.category" />
-                                    <label for="category4">Fitness</label>
-                                </div>
-                            </div>
-                        </div> -->
-
-                        <!-- <div class="formgrid grid">
-                            <div class="field col">
-                                <label for="price">Price</label>
-                                <InputNumber id="price" v-model="product.price" mode="currency" currency="USD" locale="en-US" />
-                            </div>
-                            <div class="field col">
-                                <label for="quantity">Quantity</label>
-                                <InputNumber id="quantity" v-model="product.quantity" integeronly />
-                            </div>
-                        </div> -->
                         <template #footer>
                             <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
                             <Button label="Save" icon="pi pi-check" text @click="saveProduct" />
@@ -644,7 +551,8 @@ const confirm2 = () => {
                     </Dialog>
                 </div>
             </div>
-
         </div>
+
     </div>
+
 </template>
