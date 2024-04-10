@@ -256,14 +256,14 @@ const items = ref([
         label: 'Profile',
         items: [
             {
-                label: 'Settings',
-                icon: 'pi pi-cog'
+                label: 'Arjun Shaji',
+                icon: 'pi pi-user'
             },
-            {
-                label: 'Messages',
-                icon: 'pi pi-inbox',
-                badge: 2
-            },
+            // {
+            //     label: 'Messages',
+            //     icon: 'pi pi-inbox',
+            //     badge: 2
+            // },
             {
                 label: 'Logout',
                 icon: 'pi pi-sign-out',
