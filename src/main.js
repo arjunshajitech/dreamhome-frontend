@@ -122,6 +122,7 @@ const app = createApp(App)
 app.use(router)
 app.use(PrimeVue);
 app.use(ToastService);
+app.use(ConfirmationService);
 
 app.directive('tooltip', Tooltip);
 app.directive('badge', BadgeDirective);
