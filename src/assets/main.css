@@ -1,6 +1,15 @@
 .admin-header-container {
     .p-menubar-root-list {
         display: flex;
+        justify-content: space-between;
+        width: 100%;
+        height: 40px;
+    }
+}
+
+.client-header-container {
+    .p-menubar-root-list {
+        display: flex;
         justify-content: center;
         width: 100%;
         height: 40px;
@@ -78,4 +87,13 @@
         flex-direction: column;
         row-gap: 10px;
     }
+}
+
+.list-projects, .plans {
+    align-items: center;
+    margin-top: 50px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
 }

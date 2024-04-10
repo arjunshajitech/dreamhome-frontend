@@ -12,7 +12,7 @@ const items = ref([
 </script>
 
 <template>
-    <div class="admin-header-container">
+    <div class="client-header-container">
         <div class="card">
             <Menubar :model="items" />
         </div>
