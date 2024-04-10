@@ -17,8 +17,12 @@ const adminLogout = () => {
 
 const items = ref([
     {
-        label: 'Admin Dashboard',
+        label: 'Dream Home',
         icon: 'pi pi-home'
+    },
+    {
+        label: 'Admin Dashboard',
+        icon: 'pi pi-user'
     },
     {
         label: 'Logout',

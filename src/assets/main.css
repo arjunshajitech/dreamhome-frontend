@@ -40,3 +40,9 @@
 .p-tabmenu-nav {
     column-gap: 30px;
 }
+
+.engineer-data-table {
+    margin-left: 8%;
+    margin-right: 8%;
+    margin-top: 10px;
+}
