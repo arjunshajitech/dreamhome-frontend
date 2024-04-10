@@ -1,9 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/',
+      name: 'client_register',
+      component: () => import('@/views/client/ClientRegister.vue')
+    },
+    {
+      path: '/home',
+      name: 'client_home',
+      component: () => import('@/views/client/ClientHome.vue')
+    },
     {
       path: '/admin',
       name: 'admin_login',

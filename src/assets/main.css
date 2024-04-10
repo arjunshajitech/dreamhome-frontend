@@ -16,14 +16,28 @@
     row-gap: 20px;
 }
 
+.client-login-container {
+
+    .login,
+    .signup {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 100px;
+        flex-direction: column;
+        row-gap: 20px;
+    }
+}
+
 .login-text {
-    font-size: 25px;
+    font-size: 20px;
     color: #10b981;
 }
 
 .create-account {
     text-decoration: none;
     color: #334155;
+    cursor: pointer;
 }
 
 .create-account:hover {
@@ -42,7 +56,9 @@
     column-gap: 30px;
 }
 
-.engineer-data-table,.client-data-table, .project-data-table {
+.engineer-data-table,
+.client-data-table,
+.project-data-table {
     margin-left: 8%;
     margin-right: 8%;
     margin-top: 10px;
