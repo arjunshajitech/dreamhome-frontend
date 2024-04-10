@@ -1,9 +1,9 @@
 <script setup>
-import ClientHeader from '../../components/client/Header.vue'
+import Home from '../../components/client/Home.vue'
 
 
 </script>
 
 <template>
-    <ClientHeader />
+    <Home />
 </template>

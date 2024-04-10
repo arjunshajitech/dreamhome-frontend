@@ -1,36 +1,11 @@
 <script setup>
-import { ref } from "vue";
-import { useToast } from "primevue/usetoast";
-const toast = useToast();
-import { useRouter } from 'vue-router';
+import { ref } from "vue";  
 
-const router = useRouter();
-
-const showSuccess = () => {
-    toast.add({ severity: 'success', summary: 'Success Message', detail: 'Logout Success.', group: 'br', life: 3000 });
-};
-
-const adminLogout = () => {
-    showSuccess();
-    router.push('/')
-}
 
 const items = ref([
     {
         label: 'Dream Home',
         icon: 'pi pi-home'
-    },
-    {
-        label: 'Client Dashboard',
-        icon: 'pi pi-user'
-    },
-    {
-        label: 'Logout',
-        icon: 'pi pi-sign-out',
-        command: () => {
-            adminLogout();
-        }
-
     }
 ]);
 
@@ -39,9 +14,7 @@ const items = ref([
 <template>
     <div class="admin-header-container">
         <div class="card">
-            <Toast position="bottom-right" group="br" />
             <Menubar :model="items" />
-            <Toast />
         </div>
     </div>
 </template>
