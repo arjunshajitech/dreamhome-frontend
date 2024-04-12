@@ -15,11 +15,6 @@ const confirm = useConfirm();
 const toast = useToast();
 
 
-const clientApproveRejectRequest = {
-    id: '',
-    approveOrReject: ''
-}
-
 const getAllClients = () => {
     axios.get(constants.ADMIN_GET_ALL_CLIETNS).then((response) => {
         if (response.status === 200) {
@@ -32,23 +27,6 @@ const getAllClients = () => {
 }
 getAllClients();
 
-
-// const cities = ref([
-//     { name: 'New York', code: 'NY' },
-//     { name: 'Rome', code: 'RM' },
-//     { name: 'London', code: 'LDN' },
-//     { name: 'Istanbul', code: 'IST' },
-//     { name: 'Paris', code: 'PRS' }
-// ]);
-
-// const filters = ref({
-//     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-//     name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-//     email: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-//     phone: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-//     yearofexpirence: { value: null, matchMode: FilterMatchMode.EQUALS },
-//     jobtitle: { value: null, matchMode: FilterMatchMode.STARTS_WITH }
-// });
 
 const confirm1 = (id) => {
     confirm.require({
@@ -151,15 +129,15 @@ const items = ref([
     }
 ]);
 
-const getSeverity = (product) => {
-    switch (product.inventoryStatus) {
-        case 'INSTOCK':
+const getSeverity = (status) => {
+    switch (status) {
+        case 'APPROVED':
             return 'success';
 
-        case 'LOWSTOCK':
+        case 'PENDING':
             return 'warning';
 
-        case 'OUTOFSTOCK':
+        case 'REJECTED':
             return 'danger';
 
         default:
@@ -183,21 +161,14 @@ const getSeverity = (product) => {
             <Toast />
             <ConfirmDialog></ConfirmDialog>
             <DataTable :value="clients" tableStyle="min-width: 50rem">
-                <!-- <template #header>
-                    <div class="flex flex-wrap align-items-center justify-content-between gap-2">
-                        <span class="text-xl text-900 font-bold">Clients</span>
-                        <Button icon="pi pi-refresh" rounded raised />
-                    </div>
-                </template> -->
                 <Column field="name" header="Name"></Column>
                 <Column field="email" header="Email"></Column>
                 <Column field="phone" header="Phone"></Column>
-                <Column field="status" header="Status"></Column>
-                <!-- <Column header="Status">
+                <Column header="Password">
                     <template #body="slotProps">
-                        <Tag :value="clients.status" :severity="getSeverity(clients.status)" />
+                        <p>*************</p>
                     </template>
-                </Column> -->
+                </Column>
                 <Column header="Accept">
                     <template #body="slotProps">
                         <Button label="Accept" outlined @click="confirm1(slotProps.data.id)"
@@ -208,6 +179,11 @@ const getSeverity = (product) => {
                     <template #body="slotProps">
                         <Button label="Reject" severity="danger" :disabled="isButtonDisabled(slotProps.data.status)"
                             @click="confirm2(slotProps.data.id)" outlined />
+                    </template>
+                </Column>
+                <Column header="Status">
+                    <template #body="slotProps">
+                        <Tag :value="slotProps.data.status" :severity="getSeverity(slotProps.data.status)" />
                     </template>
                 </Column>
                 <template #footer> In total there are {{ clients ? clients.length : 0 }} clients. </template>

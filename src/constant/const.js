@@ -1,6 +1,7 @@
 
 
 const BASE_URL = "http://localhost:3000/api/v1";
+const FRONT_END_BASE_URL = "http://localhost:5173"
 
 
 const ADMIN_GET_PROFILE = BASE_URL + "/admin/profile";
@@ -16,6 +17,7 @@ const CLIENT_LOGOUT = BASE_URL + '/client/logout'
 
 
 export default {
+    FRONT_END_BASE_URL,
     ADMIN_GET_PROFILE,
     ADMIN_LOGIN,
     ADMIN_LOGOUT,

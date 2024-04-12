@@ -1,9 +1,22 @@
 .admin-header-container {
     .p-menubar-root-list {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         width: 100%;
-        height: 40px;
+        height: 50px;
+        column-gap: 100px;
+    }
+
+    .p-menubar {
+        color: var(--primary-color);
+        /* color: var(--primary-color-text); */
+    }
+
+    .p-menuitem-link,
+    .p-menuitem-icon,
+    .p-menuitem-text {
+        color: var(--primary-color);
+        font-size: 20px;
     }
 }
 
@@ -12,7 +25,20 @@
         display: flex;
         justify-content: center;
         width: 100%;
-        height: 40px;
+        height: 50px;
+        column-gap: 100px;
+    }
+
+    .p-menubar {
+        color: var(--primary-color);
+        /* color: var(--primary-color-text); */
+    }
+
+    .p-menuitem-link,
+    .p-menuitem-icon,
+    .p-menuitem-text {
+        color: var(--primary-color);
+        font-size: 20px;
     }
 }
 
@@ -40,7 +66,6 @@
 
 .login-text {
     font-size: 20px;
-    color: #10b981;
 }
 
 .create-account {
@@ -97,7 +122,8 @@
     }
 }
 
-.list-projects, .plans {
+.list-projects,
+.plans {
     align-items: center;
     margin-top: 50px;
     width: 100%;
