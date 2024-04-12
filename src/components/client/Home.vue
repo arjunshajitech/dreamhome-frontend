@@ -4,7 +4,10 @@ import { FilterMatchMode } from 'primevue/api';
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import { useRouter } from 'vue-router';
+import axios from 'axios';
+import constants from '../../constant/const'
 
+axios.defaults.withCredentials = true;
 const router = useRouter();
 const customers = ref();
 const loading = ref(true);
@@ -190,7 +193,10 @@ const changeDataTable = (data) => {
 }
 
 const logout = () => {
-    router.push('/')
+    axios.post(constants.CLIENT_LOGOUT).then((response) => {
+        if (response.status === 200)
+            router.push('/')
+    }).catch((error) => { console.error(error) });
 }
 
 const items = ref([

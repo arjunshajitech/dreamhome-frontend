@@ -20,16 +20,12 @@ onMounted(() => {
 
 const adminLogin = () => {
     axios.post(constants.ADMIN_LOGIN, adminLoginRequest).then((response) => {
-        console.log(adminLoginRequest.email);
-        console.log(adminLoginRequest.password);
         if (response.status === 200) {
             toast.add({ severity: 'success', summary: 'Success Message', detail: 'Login Success.', group: 'br', life: 3000 });
             setTimeout(() => {
                 router.push('/admin/home');
             }, 500);
-        } else {
         }
-
     }).catch((error) => {
         toast.add({ severity: 'error', summary: 'Error Message', detail: 'Bad Credentails.', group: 'br', life: 3000 });
         router.push('/admin');
