@@ -160,7 +160,7 @@ const getSeverity = (status) => {
         <div class="card">
             <Toast />
             <ConfirmDialog></ConfirmDialog>
-            <DataTable :value="clients" tableStyle="min-width: 50rem">
+            <DataTable :value="clients" tableStyle="min-width: 50rem" scrollable scrollHeight="600px">
                 <Column field="name" header="Name"></Column>
                 <Column field="email" header="Email"></Column>
                 <Column field="phone" header="Phone"></Column>

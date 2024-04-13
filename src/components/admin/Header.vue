@@ -26,7 +26,10 @@ const showSuccess = () => {
 
 const adminLogout = () => {
     showSuccess();
-    router.push('/admin')
+    setTimeout(() => {
+        router.push('/admin');
+    }, 500);
+
 }
 
 const items = ref([
@@ -44,7 +47,7 @@ const items = ref([
         command: () => {
             adminLogout();
         },
-        visible : showLogout
+        visible: showLogout
 
     }
 ]);
