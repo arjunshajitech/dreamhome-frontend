@@ -3,7 +3,6 @@
 const BASE_URL = "http://localhost:3000/api/v1";
 const FRONT_END_BASE_URL = "http://localhost:5173"
 
-
 const ADMIN_GET_PROFILE = BASE_URL + "/admin/profile";
 const ADMIN_LOGIN = BASE_URL + '/admin/login'
 const ADMIN_LOGOUT = BASE_URL + '/admin/logout'
@@ -15,7 +14,6 @@ const ADMIN_GET_JOBS = BASE_URL + '/admin/jobs'
 const ADMIN_APPROVED_ENGINEERS = BASE_URL + '/admin/engineers/approved'
 const ADMIN_ASSIGN_ENGINEER = BASE_URL + '/admin/assign'
 
-
 const CLIENT_REGISTER = BASE_URL + "/client/signup"
 const CLIENT_LOGIN = BASE_URL + "/client/login"
 const CLIENT_LOGOUT = BASE_URL + '/client/logout'
@@ -23,12 +21,15 @@ const CLIENT_CREATE_PROJECT = BASE_URL + '/client/project'
 const CLIENT_GET_PROJECT = BASE_URL + '/client/project'
 const CLIENT_DELETE_PROJECT = BASE_URL + '/client/project'
 const CLIENT_PROFILE_URL = BASE_URL + '/client/profile'
+const CLIENT_PAY_MODEL = BASE_URL + '/client/pay/model'
+const CLIENT_PAY_PLAN = BASE_URL + '/client/pay/plan'
 
 const ENGINEER_LOGIN = BASE_URL + '/engineer/login'
 const ENGINEER_SIGNUP = BASE_URL + '/engineer/signup'
 const ENGINEER_LOGOUT = BASE_URL + '/engineer/logout'
 const ENGINEER_PROFILE = BASE_URL + '/engineer/profile'
 const ENGINEER_JOBS = BASE_URL + '/engineer/jobs'
+const ENGINEER_UPDATE_PROJECT = BASE_URL + '/engineer/project'
 
 
 export default {
@@ -54,5 +55,8 @@ export default {
     ADMIN_GET_JOBS,
     ADMIN_APPROVED_ENGINEERS,
     ADMIN_ASSIGN_ENGINEER,
-    ENGINEER_JOBS
+    ENGINEER_JOBS,
+    ENGINEER_UPDATE_PROJECT,
+    CLIENT_PAY_MODEL,
+    CLIENT_PAY_PLAN
 };

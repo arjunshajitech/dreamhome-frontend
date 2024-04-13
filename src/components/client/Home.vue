@@ -317,37 +317,50 @@ const logout = () => {
 }
 
 
-const confirm1 = () => {
+const payPlan = (id, planAmount) => {
     confirm.require({
-        message: 'Are you sure you want to accept?',
-        header: 'Confirmation',
+        message: 'Are you sure you want to pay?',
+        header: 'Dummy Plan Payment',
         icon: 'pi pi-exclamation-triangle',
         rejectClass: 'p-button-secondary p-button-outlined',
         rejectLabel: 'Cancel',
-        acceptLabel: 'Accept',
+        acceptLabel: 'Pay ₹' + planAmount,
         accept: () => {
-            toast.add({ severity: 'success', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
+            axios.post(constants.CLIENT_PAY_PLAN + "/" + id).then((response) => {
+                if (response.status === 200) {
+                    getAllProjects();
+                    toast.add({ severity: 'success', summary: 'Dummy Payment', detail: 'Payment success.', life: 3000 });
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
         },
         reject: () => {
-            toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have cancelled', life: 3000 });
+            toast.add({ severity: 'info', summary: 'Dummy payment', detail: 'You have cancelled', life: 3000 });
         }
     });
 };
 
-const confirm2 = () => {
+const modelPayment = (id, modelAmount) => {
     confirm.require({
-        message: 'Are you sure you want to reject?',
-        header: 'Danger Zone',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        acceptLabel: 'Reject',
+        message: 'Are you sure you want to pay?',
+        header: 'Dummy 3D Model Payment',
+        icon: 'pi pi-exclamation-triangle',
         rejectClass: 'p-button-secondary p-button-outlined',
-        acceptClass: 'p-button-danger',
+        rejectLabel: 'Cancel',
+        acceptLabel: 'Pay ₹' + modelAmount,
         accept: () => {
-            toast.add({ severity: 'success', summary: 'Confirmed', detail: 'You have rejected', life: 3000 });
+            axios.post(constants.CLIENT_PAY_MODEL + "/" + id).then((response) => {
+                if (response.status === 200) {
+                    getAllProjects();
+                    toast.add({ severity: 'success', summary: 'Dummy Payment', detail: 'Payment success.', life: 3000 });
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
         },
         reject: () => {
-            toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have cancelled', life: 3000 });
+            toast.add({ severity: 'info', summary: 'Dummy payment', detail: 'You have cancelled', life: 3000 });
         }
     });
 };
@@ -416,7 +429,7 @@ const confirm2 = () => {
                                 </div>
                                 <div v-else-if="slotProps.data.planAmount != 0">
                                     <Button label="Pay" severity="success" :disabled="false"
-                                        @click="confirm2(slotProps.data.id)" outlined />
+                                        @click="payPlan(slotProps.data.id, slotProps.data.planAmount)" outlined />
                                 </div>
                                 <div v-else>
                                     <Tag value="PAYMENT PENDING" severity="warning" />
@@ -430,7 +443,8 @@ const confirm2 = () => {
                                 </div>
                                 <div v-else-if="slotProps.data.threeDModelAmount != 0">
                                     <Button label="Pay" severity="success" :disabled="false"
-                                        @click="confirm2(slotProps.data.id)" outlined />
+                                        @click="modelPayment(slotProps.data.id, slotProps.data.threeDModelAmount)"
+                                        outlined />
                                 </div>
                                 <div v-else>
                                     <Tag value="PAYMENT PENDING" severity="warning" />
@@ -544,87 +558,6 @@ const confirm2 = () => {
             </div>
         </div>
 
-
-        <!-- <div class="list-projects">
-            <div v-if="dataTable === 'plans'" class="engineer-data-table">
-                <div class="card">
-                    <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id"
-                        :paginator="true" :rows="10" :filters="filterss"
-                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        :rowsPerPageOptions="[5, 10, 25]"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} plans">
-                        <template #header>
-                            <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
-                                <h4 class="m-0">Manage Plans</h4>
-                                <IconField iconPosition="left">
-                                    <InputIcon>
-                                        <i class="pi pi-search" />
-                                    </InputIcon>
-                                    <InputText v-model="filters['global'].value" placeholder="Search..." />
-                                </IconField>
-                            </div>
-                        </template>
-                        <Column field="code" header="Project Name" sortable style="min-width:12rem"></Column>
-                        <Column field="name" header="Plan Price" sortable style="min-width:16rem"></Column>
-                        <Column header="Plan Image">
-                            <template #body="slotProps">
-                                <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`"
-                                    :alt="slotProps.data.image" class="border-round" style="width: 250px" />
-                            </template>
-                        </Column>
-                        <Column field="accept" header="Accept" style="min-width: 12rem">
-                            <template #body="{ data }">
-                                <Button @click="confirm1()" label="Accept" outlined></Button>
-                            </template>
-                        </Column>
-                        <Column field="reject" header="Reject" style="min-width: 12rem">
-                            <template #body="{ data }">
-                                <Button @click="confirm2()" label="Reject" severity="danger" outlined></Button>
-                            </template>
-                        </Column>
-                    </DataTable>
-                </div>
-            </div> -->
-
-        <!-- <div v-else-if="dataTable === 'models'" class="models">
-                <div class="card">
-                    <DataTable ref="dt" :value="products" v-model:selection="selectedProducts" dataKey="id"
-                        :paginator="true" :rows="10" :filters="filterss"
-                        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        :rowsPerPageOptions="[5, 10, 25]"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} 3D models">
-                        <template #header>
-                            <div class="flex flex-wrap gap-2 align-items-center justify-content-between">
-                                <h4 class="m-0">Manage 3D Models</h4>
-                                <IconField iconPosition="left">
-                                    <InputIcon>
-                                        <i class="pi pi-search" />
-                                    </InputIcon>
-                                    <InputText v-model="filters['global'].value" placeholder="Search..." />
-                                </IconField>
-                            </div>
-                        </template>
-                        <Column field="code" header="Project Name" sortable style="min-width:12rem"></Column>
-                        <Column field="name" header="Plan Price" sortable style="min-width:16rem"></Column>
-                        <Column header="3D Model Image">
-                            <template #body="slotProps">
-                                <img :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.data.image}`"
-                                    :alt="slotProps.data.image" class="border-round" style="width: 250px" />
-                            </template>
-                        </Column>
-                        <Column field="accept" header="Accept" style="min-width: 12rem">
-                            <template #body="{ data }">
-                                <Button @click="confirm1()" label="Accept" outlined></Button>
-                            </template>
-                        </Column>
-                        <Column field="reject" header="Reject" style="min-width: 12rem">
-                            <template #body="{ data }">
-                                <Button @click="confirm2()" label="Reject" severity="danger" outlined></Button>
-                            </template>
-                        </Column>
-                    </DataTable>
-                </div>
-            </div> -->
     </div>
 
 </template>

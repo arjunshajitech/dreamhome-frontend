@@ -19,40 +19,17 @@ const project = ref({});
 const submitted = ref(false);
 const loggedUserName = ref('')
 const jobs = ref([]);
-
-// create project
-const projectDescription = ref('')
-const type = ref('');
-const projectName = ref('')
-const projectTimeline = ref('1');
-const style = ref('')
-const errroProjectDescription = ref(false);
-const errorProjectType = ref(false);
-const errorProjectName = ref(false);
-const errorProjectTimeline = ref(false);
-const errorProjectStyle = ref(false);
+const uploadPlan = ref(false);
+const uploadModel = ref(false)
 
 
-const projectStyle = ref([
-    {
-        label: 'MODERN', value: 'MODERN'
-    },
-    {
-        label: 'TRADITIONAL', value: 'TRADITIONAL'
-    }
-])
+const planAmount = ref('100')
+const threeDModelAmount = ref('100')
+const errorPlanAmount = ref(false)
+const errorThreeDModel = ref(false)
+const updateProjectId = ref('');
 
-const projectType = ref([
-    {
-        label: 'RESIDENTIAL', value: 'RESIDENTIAL'
-    },
-    {
-        label: 'COMMERCIAL', value: 'COMMERCIAL'
-    },
-    {
-        label: 'RENOVATION', value: 'RENOVATION'
-    }
-])
+
 
 const getAllJobs = () => {
     axios.get(constants.ENGINEER_JOBS).then((response) => {
@@ -76,85 +53,71 @@ onMounted(() => {
 })
 
 
-const clearCreateProject = () => {
-    projectDescription.value = ''
-    type.value = ''
-    style.value = ''
-    projectTimeline.value = '1'
-    projectName.value = ''
-    errroProjectDescription.value = false;
-    errorProjectType.value = false;
-    errorProjectName.value = false;
-    errorProjectTimeline.value = false;
-    errorProjectStyle.value = false;
+const clearUpdateProject = () => {
+    planAmount.value = '100',
+        threeDModelAmount.value = '100'
+    errorPlanAmount.value = false,
+        errorThreeDModel.value = false;
+    updateProjectId.value = ''
 }
 
-const validateSaveProject = () => {
-    if (projectName.value === null || projectName.value === '') {
-        errorProjectName.value = true;
+const validateUpdateDetails = () => {
+    if (planAmount.value === null || planAmount.value === '' || planAmount.value < 100) {
+        errorPlanAmount.value = true;
         return true;
     }
-    else errorProjectName.value = false;
-    if (projectDescription.value === null || projectDescription.value === '') {
-        errroProjectDescription.value = true;
+    else errorPlanAmount.value = false;
+    if (threeDModelAmount.value === null || threeDModelAmount.value === '' || threeDModelAmount.value < 100) {
+        errorThreeDModel.value = true;
         return true;
     }
-    else errroProjectDescription.value = false;
-    if (type.value === null || type.value === '') {
-        errorProjectType.value = true;
-        return true;
-    }
-    else errorProjectType.value = false;
-    if (style.value === null || style.value === '') {
-        errorProjectStyle.value = true;
-        return true;
-    }
-    else errorProjectStyle.value = false;
-    if (projectTimeline.value === null || projectTimeline.value === '' || projectTimeline.value <= 0) {
-        errorProjectTimeline.value = true;
-        return true;
-    }
-    else errorProjectTimeline.value = false;
-
+    else errorThreeDModel.value = false;
+    return false;
 }
 
 
 const saveProject = () => {
 
-    // if (validateSaveProject()) return;
+    if (validateUpdateDetails()) return;
 
-    // axios.post(constants.CLIENT_CREATE_PROJECT, {
-    //     name: projectName.value,
-    //     type: type.value.value,
-    //     architectureStyle: style.value.value,
-    //     timeline: projectTimeline.value,
-    //     description: projectDescription.value
-    // }).then((response) => {
-    //     if (response.status === 200) {
-    //         submitted.value = true;
-    //         productDialog.value = false;
-    //         getAllProjects();
-    //         clearCreateProject();
-    //         toast.add({ severity: 'success', summary: 'Create project', detail: 'New Project created.', life: 3000 });
-    //     }
-    // }).catch((error) => {
-    //     if (error.response.status === 401)
-    //         toast.add({ severity: 'error', summary: 'Create project', detail: 'Project already exists.', life: 3000 });
-    //     else
-    //         toast.add({ severity: 'warn', summary: 'Create project', detail: 'Something went wrong.', life: 3000 });
-    //     console.error(error);
-    // });
+    axios.put(constants.ENGINEER_UPDATE_PROJECT, {
+        id: updateProjectId.value,
+        planEstimation: '0',
+        threeDModelEstimation: '0',
+        planAmount: planAmount.value,
+        threeDModelAmount: threeDModelAmount.value
+    }).then((response) => {
+        if (response.status === 200) {
+            productDialog.value = false;
+            getAllJobs();
+            clearUpdateProject();
+            toast.add({ severity: 'success', summary: 'Update project', detail: 'Project udpated', life: 3000 });
+        }
+    }).catch((error) => {
+        toast.add({ severity: 'warn', summary: 'Update project', detail: 'Something went wrong.', life: 3000 });
+        console.error(error);
+    });
 };
 
 
 
 
-const openNew = () => {
-    clearCreateProject();
+const openNew = (id) => {
+    clearUpdateProject();
+    updateProjectId.value = id;
     project.value = {};
     submitted.value = false;
     productDialog.value = true;
 };
+
+const uploadPlanOpen = (id) => {
+    uploadPlan.value = true;
+}
+
+const uploadModelOpen = (id) => {
+    uploadModel.value = true;
+}
+
 const hideDialog = () => {
     productDialog.value = false;
     submitted.value = false;
@@ -285,6 +248,10 @@ const confirm2 = () => {
     });
 };
 
+const checkUpdateButtonDisable = (slotProps) => {
+    return slotProps.data.planAmount != 0 && slotProps.data.threeDModelAmount != 0
+}
+
 const items = ref([
     {
         separator: true
@@ -295,7 +262,7 @@ const items = ref([
             {
                 label: 'Jobs',
                 icon: 'pi pi-receipt',
-                badge: 9,
+                badge: computed(() => jobs.value.length),
                 command: () => {
                     getAllJobs();
                     changeDataTable('jobs');
@@ -403,7 +370,8 @@ const items = ref([
                     <Column header="Plan payment" style="min-width:12rem">
                         <template #body="slotProps">
                             <div v-if="slotProps.data.planAmountPaid === true">
-                                <Tag value="PAYMENT SUCCESS" severity="success" />
+                                <Button label="Upload plan" icon="pi pi-file" severity="success" class=""
+                                    @click="uploadPlanOpen(slotProps.data.id)" />
                             </div>
                             <div v-else>
                                 <Tag value="PAYMENT PENDING" severity="warning" />
@@ -413,7 +381,8 @@ const items = ref([
                     <Column header="3D model payment" style="min-width:12rem">
                         <template #body="slotProps">
                             <div v-if="slotProps.data.threeDModelAmountPaid === true">
-                                <Tag value="PAYMENT SUCCESS" severity="success" />
+                                <Button label="Upload Model" icon="pi pi-file" severity="success" class=""
+                                    @click="uploadModelOpen(slotProps.data.id)" />
                             </div>
                             <div v-else>
                                 <Tag value="PAYMENT PENDING" severity="warning" />
@@ -422,8 +391,8 @@ const items = ref([
                     </Column>
                     <Column header="Status" style="min-width:12rem">
                         <template #body="slotProps">
-                            <Button v-if="slotProps.data.planAmount === 0 && slotProps.data.threeDModelAmount === 0" label="Update details" icon="pi pi-plus" severity="success" class="mr-2"
-                                @click="openNew()" />
+                            <Button :disabled="checkUpdateButtonDisable(slotProps)" label="Update details"
+                                icon="pi pi-plus" severity="success" class="" @click="openNew(slotProps.data.id)" />
                         </template>
                     </Column>
                     <template #footer> In total there are {{ jobs ? jobs.length : 0 }} jobs.
@@ -432,40 +401,64 @@ const items = ref([
             </div>
 
             <Dialog v-model:visible="productDialog" :style="{ width: '450px' }" header="Update job details"
-                    :modal="true" class="p-fluid">
-                    <div class="field">
-                        <label for="name">Plan amount</label>
-                        <InputNumber id="name" v-model.trim="projectTimeline" required="true" autofocus
-                            :invalid="errorProjectTimeline" />
-                        <small class="p-error" v-if="errorProjectTimeline">Timeline must be greater than or equal to
-                            1.</small>
-                    </div>
-                    <div class="field">
-                        <label for="name">3D Model amount</label>
-                        <InputNumber id="name" v-model.trim="projectTimeline" required="true" autofocus
-                            :invalid="errorProjectTimeline" />
-                        <small class="p-error" v-if="errorProjectTimeline">Timeline must be greater than or equal to
-                            1.</small>
-                    </div>
-                    <div class="field">
-                        <label for="name">Plan estimation</label>
-                        <InputNumber id="name" v-model.trim="projectTimeline" required="true" autofocus
-                            :invalid="errorProjectTimeline" />
-                        <small class="p-error" v-if="errorProjectTimeline">Timeline must be greater than or equal to
-                            1.</small>
-                    </div>
-                    <div class="field">
-                        <label for="name">3D Model estimation</label>
-                        <InputNumber id="name" v-model.trim="projectTimeline" required="true" autofocus
-                            :invalid="errorProjectTimeline" />
-                        <small class="p-error" v-if="errorProjectTimeline">Timeline must be greater than or equal to
-                            1.</small>
-                    </div>
-                    <template #footer>
-                        <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                        <Button label="Save" icon="pi pi-check" text @click="saveProject" />
-                    </template>
-                </Dialog>
+                :modal="true" class="p-fluid">
+                <div class="field">
+                    <label for="name">Plan amount</label>
+                    <InputNumber id="name" v-model.trim="planAmount" required="true" autofocus
+                        :invalid="errorPlanAmount" />
+                    <small class="p-error" v-if="errorPlanAmount">Plan amount must be greater than or equal to
+                        100</small>
+                </div>
+                <div class="field">
+                    <label for="name">3D Model amount</label>
+                    <InputNumber id="name" v-model.trim="threeDModelAmount" required="true" autofocus
+                        :invalid="errorThreeDModel" />
+                    <small class="p-error" v-if="errorThreeDModel">3D Model amount must be greater than or equal to
+                        100</small>
+                </div>
+                <!-- <div class="field">
+                    <label for="name">Plan estimation (days)</label>
+                    <InputNumber id="name" v-model.trim="planEstimation" required="true" autofocus
+                        :invalid="errorPlanEstimation" />
+                    <small class="p-error" v-if="errorPlanEstimation">Timeline must be greater than or equal to
+                        1.</small>
+                </div>
+                <div class="field">
+                    <label for="name">3D Model estimation</label>
+                    <InputNumber id="name" v-model.trim="projectTimeline" required="true" autofocus
+                        :invalid="errroThreeDMOdelEstimation" />
+                    <small class="p-error" v-if="errorProjectTimeline">Timeline must be greater than or equal to
+                        1.</small>
+                </div> -->
+                <template #footer>
+                    <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
+                    <Button label="Save" icon="pi pi-check" text @click="saveProject" />
+                </template>
+            </Dialog>
+
+            <Dialog v-model:visible="uploadPlan" :style="{ width: '450px' }" header="Upload plan" :modal="true"
+                class="p-fluid">
+                <div class="field card flex justify-content-center">
+                    <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" :maxFileSize="1000000"
+                        @upload="onUpload" />
+                </div>
+                <template #footer>
+                    <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
+                    <Button label="Upload" icon="pi pi-check" text @click="saveProject" />
+                </template>
+            </Dialog>
+
+            <Dialog v-model:visible="uploadModel" :style="{ width: '450px' }" header="Upload plan" :modal="true"
+                class="p-fluid">
+                <div class="field card flex justify-content-center">
+                    <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" :maxFileSize="1000000"
+                        @upload="onUpload" />
+                </div>
+                <template #footer>
+                    <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
+                    <Button label="Upload" icon="pi pi-check" text @click="saveProject" />
+                </template>
+            </Dialog>
 
         </div>
     </div>
