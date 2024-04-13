@@ -14,6 +14,8 @@ const ADMIN_APPROVE_CLIENT = BASE_URL + '/admin/approve/client'
 const CLIENT_REGISTER = BASE_URL + "/client/signup"
 const CLIENT_LOGIN = BASE_URL + "/client/login"
 const CLIENT_LOGOUT = BASE_URL + '/client/logout'
+const CLIENT_CREATE_PROJECT = BASE_URL + '/client/project'
+const CLIENT_GET_PROJECT = BASE_URL + '/client/project'
 
 
 export default {
@@ -25,5 +27,7 @@ export default {
     CLIENT_LOGIN,
     ADMIN_GET_ALL_CLIETNS,
     ADMIN_APPROVE_CLIENT,
-    CLIENT_LOGOUT
+    CLIENT_LOGOUT,
+    CLIENT_CREATE_PROJECT,
+    CLIENT_GET_PROJECT
 };
