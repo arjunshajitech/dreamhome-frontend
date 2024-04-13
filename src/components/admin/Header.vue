@@ -21,15 +21,18 @@ onMounted(() => {
 
 
 const showSuccess = () => {
-    toast.add({ severity: 'success', summary: 'Success Message', detail: 'Logout Success.', group: 'br', life: 3000 });
+    toast.add({ severity: 'success', summary: 'Admin Logout', detail: 'Logout Success.', life: 3000 });
 };
 
 const adminLogout = () => {
-    showSuccess();
-    setTimeout(() => {
-        router.push('/admin');
-    }, 500);
-
+    axios.get(constants.ADMIN_LOGOUT).then((response) => {
+        if (response.status === 200) {
+            showSuccess();
+            setTimeout(() => {
+                router.push('/admin')
+            }, 500)
+        }
+    }).catch((error) => { console.error(error) });
 }
 
 const items = ref([

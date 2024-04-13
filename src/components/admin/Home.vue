@@ -10,6 +10,7 @@ import constants from '../../constant/const'
 axios.defaults.withCredentials = true;
 const router = useRouter();
 const clients = ref([]);
+const engineers = ref([]);
 const dataTable = ref('client')
 const confirm = useConfirm();
 const toast = useToast();
@@ -21,11 +22,75 @@ const getAllClients = () => {
             clients.value = response.data;
         }
     }).catch((error) => {
-        router.push('/admin')
         console.error(error);
     });
 }
 getAllClients();
+
+const getAllEngineers = () => {
+    axios.get(constants.ADMIN_GET_ALL_ENGINEERS).then((response) => {
+        if (response.status === 200) {
+            engineers.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+const approveEngineer = (id) => {
+    confirm.require({
+        message: 'Are you sure you want to accept?',
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        rejectClass: 'p-button-secondary p-button-outlined',
+        rejectLabel: 'Cancel',
+        acceptLabel: 'Accept',
+        accept: () => {
+            axios.post(constants.ADMIN_APPROVE_ENGINEER, {
+                id: id,
+                approveOrReject: true
+            }).then((response) => {
+                if (response.status === 200) {
+                    toast.add({ severity: 'success', summary: 'Apprve Engineer', detail: 'You have accepted', life: 3000 });
+                    getAllEngineers();
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+        },
+        reject: () => {
+            toast.add({ severity: 'info', summary: 'Approve Engineer', detail: 'You have cancelled', life: 3000 });
+        }
+    });
+};
+
+const rejectEngineer = (id) => {
+    confirm.require({
+        message: 'Are you sure you want to reject?',
+        header: 'Danger Zone',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        acceptLabel: 'Reject',
+        rejectClass: 'p-button-secondary p-button-outlined',
+        acceptClass: 'p-button-danger',
+        accept: () => {
+            axios.post(constants.ADMIN_APPROVE_ENGINEER, {
+                id: id,
+                approveOrReject: false
+            }).then((response) => {
+                if (response.status === 200) {
+                    toast.add({ severity: 'success', summary: 'Approve Engineer', detail: 'You have rejected', life: 3000 });
+                    getAllEngineers();
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+        },
+        reject: () => {
+            toast.add({ severity: 'info', summary: 'Approve Engineer', detail: 'You have cancelled', life: 3000 });
+        }
+    });
+};
 
 
 const confirm1 = (id) => {
@@ -42,7 +107,7 @@ const confirm1 = (id) => {
                 approveOrReject: true
             }).then((response) => {
                 if (response.status === 200) {
-                    toast.add({ severity: 'success', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
+                    toast.add({ severity: 'success', summary: 'Approve Client', detail: 'You have accepted', life: 3000 });
                     getAllClients();
                 }
             }).catch((error) => {
@@ -50,7 +115,7 @@ const confirm1 = (id) => {
             });
         },
         reject: () => {
-            toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have cancelled', life: 3000 });
+            toast.add({ severity: 'info', summary: 'Approve Client', detail: 'You have cancelled', life: 3000 });
         }
     });
 };
@@ -70,7 +135,7 @@ const confirm2 = (id) => {
                 approveOrReject: false
             }).then((response) => {
                 if (response.status === 200) {
-                    toast.add({ severity: 'success', summary: 'Confirmed', detail: 'You have rejected', life: 3000 });
+                    toast.add({ severity: 'success', summary: 'Approve Client', detail: 'You have rejected', life: 3000 });
                     getAllClients();
                 }
             }).catch((error) => {
@@ -78,7 +143,7 @@ const confirm2 = (id) => {
             });
         },
         reject: () => {
-            toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have cancelled', life: 3000 });
+            toast.add({ severity: 'info', summary: 'Approve Client', detail: 'You have cancelled', life: 3000 });
         }
     });
 };
@@ -88,6 +153,10 @@ const isButtonDisabled = (status) => {
 }
 
 onMounted(() => {
+    axios.get(constants.ADMIN_GET_PROFILE).then(() => { }).catch((error) => {
+        router.push('/admin')
+        console.error(error)
+    });
     getAllClients();
 });
 
@@ -108,9 +177,10 @@ const items = ref([
     {
         label: 'Engineer',
         icon: 'pi pi-hammer',
-        // command: () => {
-        //     changeDataTable('engineer');
-        // }
+        command: () => {
+            getAllEngineers();
+            changeDataTable('engineer');
+        }
     },
     {
         label: 'Assing Job',
@@ -156,7 +226,7 @@ const getSeverity = (status) => {
         </div>
     </div>
 
-    <div class="client-details mt-5">
+    <div class="client-details mt-5" v-if="dataTable === 'client'">
         <div class="card">
             <Toast />
             <ConfirmDialog></ConfirmDialog>
@@ -164,11 +234,6 @@ const getSeverity = (status) => {
                 <Column field="name" header="Name"></Column>
                 <Column field="email" header="Email"></Column>
                 <Column field="phone" header="Phone"></Column>
-                <Column header="Password">
-                    <template #body="slotProps">
-                        <p>*************</p>
-                    </template>
-                </Column>
                 <Column header="Accept">
                     <template #body="slotProps">
                         <Button label="Accept" outlined @click="confirm1(slotProps.data.id)"
@@ -179,6 +244,42 @@ const getSeverity = (status) => {
                     <template #body="slotProps">
                         <Button label="Reject" severity="danger" :disabled="isButtonDisabled(slotProps.data.status)"
                             @click="confirm2(slotProps.data.id)" outlined />
+                    </template>
+                </Column>
+                <Column header="Status">
+                    <template #body="slotProps">
+                        <Tag :value="slotProps.data.status" :severity="getSeverity(slotProps.data.status)" />
+                    </template>
+                </Column>
+                <template #footer> In total there are {{ clients ? clients.length : 0 }} clients. </template>
+            </DataTable>
+        </div>
+    </div>
+
+    <div class="client-details mt-5" v-else-if="dataTable === 'engineer'">
+        <div class="card">
+            <Toast />
+            <ConfirmDialog></ConfirmDialog>
+            <DataTable :value="engineers" tableStyle="min-width: 50rem" scrollable scrollHeight="600px">
+                <Column field="name" header="Name"></Column>
+                <Column field="email" header="Email"></Column>
+                <Column field="phone" header="Phone"></Column>
+                <Column field="jobTitle" header="Job Title"></Column>
+                <Column field="yearOfExperience" header="Year of experience" style="min-width:12rem">
+                    <template #body="slotProps">
+                        <span>{{ slotProps.data.yearOfExperience }} years</span>
+                    </template>
+                </Column>
+                <Column header="Accept">
+                    <template #body="slotProps">
+                        <Button label="Accept" outlined @click="approveEngineer(slotProps.data.id)"
+                            :disabled="isButtonDisabled(slotProps.data.status)" />
+                    </template>
+                </Column>
+                <Column header="Reject">
+                    <template #body="slotProps">
+                        <Button label="Reject" severity="danger" :disabled="isButtonDisabled(slotProps.data.status)"
+                            @click="rejectEngineer(slotProps.data.id)" outlined />
                     </template>
                 </Column>
                 <Column header="Status">

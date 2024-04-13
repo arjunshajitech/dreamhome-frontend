@@ -9,6 +9,8 @@ const ADMIN_LOGIN = BASE_URL + '/admin/login'
 const ADMIN_LOGOUT = BASE_URL + '/admin/logout'
 const ADMIN_GET_ALL_CLIETNS = BASE_URL + '/admin/clients'
 const ADMIN_APPROVE_CLIENT = BASE_URL + '/admin/approve/client'
+const ADMIN_GET_ALL_ENGINEERS = BASE_URL + '/admin/engineers'
+const ADMIN_APPROVE_ENGINEER = BASE_URL + '/admin/approve/engineer'
 
 
 const CLIENT_REGISTER = BASE_URL + "/client/signup"
@@ -17,6 +19,12 @@ const CLIENT_LOGOUT = BASE_URL + '/client/logout'
 const CLIENT_CREATE_PROJECT = BASE_URL + '/client/project'
 const CLIENT_GET_PROJECT = BASE_URL + '/client/project'
 const CLIENT_DELETE_PROJECT = BASE_URL + '/client/project'
+const CLIENT_PROFILE_URL = BASE_URL + '/client/profile'
+
+const ENGINEER_LOGIN = BASE_URL + '/engineer/login'
+const ENGINEER_SIGNUP = BASE_URL + '/engineer/signup'
+const ENGINEER_LOGOUT = BASE_URL + '/engineer/logout'
+const ENGINEER_PROFILE = BASE_URL + '/engineer/profile'
 
 
 export default {
@@ -31,5 +39,12 @@ export default {
     CLIENT_LOGOUT,
     CLIENT_CREATE_PROJECT,
     CLIENT_GET_PROJECT,
-    CLIENT_DELETE_PROJECT
+    CLIENT_DELETE_PROJECT,
+    CLIENT_PROFILE_URL,
+    ENGINEER_LOGIN,
+    ENGINEER_LOGOUT,
+    ENGINEER_PROFILE,
+    ENGINEER_SIGNUP,
+    ADMIN_GET_ALL_ENGINEERS,
+    ADMIN_APPROVE_ENGINEER
 };

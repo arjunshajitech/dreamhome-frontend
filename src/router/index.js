@@ -22,15 +22,17 @@ const router = createRouter({
       path: '/admin/home',
       name: 'admin_home',
       component: () => import('@/views/admin/AdminHome.vue')
+    },
+    {
+      path: '/engineer',
+      name: 'engineer_login',
+      component: () => import('@/views/engineer/EngineerRegister.vue')
+    },
+    {
+      path: '/engineer/home',
+      name: 'engineer_home',
+      component: () => import('@/views/engineer/EngineerHome.vue')
     }
-    // {
-    //   path: '/about',
-    //   name: 'about',
-    //   // route level code-splitting
-    //   // this generates a separate chunk (About.[hash].js) for this route
-    //   // which is lazy-loaded when the route is visited.
-    //   component: () => import('../views/AboutView.vue')
-    // }
   ]
 })
 

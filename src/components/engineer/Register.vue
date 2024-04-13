@@ -16,12 +16,16 @@ const invalidRegisterName = ref(false);
 const invalidRegisterEmail = ref(false);
 const invalidRegisterPhone = ref(false);
 const invalidRegisterPassword = ref(false);
+const invalidRegisterJobTitle = ref(false);
+const invalidRegisterYearOfExpirence = ref(false);
 
 const registerRequest = {
     name: '',
     email: '',
     password: '',
-    phone: ''
+    phone: '',
+    jobTitle: '',
+    yearOfExperience: ''
 }
 
 const loginRequest = {
@@ -38,12 +42,13 @@ const clearRegisterForm = () => {
     registerRequest.name = '',
         registerRequest.email = '',
         registerRequest.password = '',
-        registerRequest.phone = ''
+        registerRequest.phone = '',
+        registerRequest.jobTitle = '',
+        registerRequest.yearOfExperience = ''
 }
 
 
 const switchForm = (val) => {
-    console.log(val);
     if (val === 'login') {
         login.value = true;
         clearLoginForm();
@@ -61,6 +66,10 @@ const validateEmail = (email) => {
 const isValidPhoneNumber = (input) => {
     var regex = /^\d{10}$/;
     return regex.test(input);
+}
+
+const validateNumber = (value) => {
+    return (!isNaN(value) && value >= 0)
 }
 
 const validateClientLoginRequest = () => {
@@ -110,6 +119,20 @@ const validateClientRegisterRequest = () => {
         toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid phone', life: 3000 });
         return true;
     } else invalidRegisterPhone.value = false;
+
+    if (registerRequest.jobTitle === null ||
+        registerRequest.jobTitle === '') {
+        invalidRegisterJobTitle.value = true
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid job title', life: 3000 });
+        return true;
+    } else invalidRegisterJobTitle.value = false;
+
+    if (registerRequest.yearOfExperience === null ||
+        registerRequest.yearOfExperience === '' || !validateNumber(registerRequest.yearOfExperience)) {
+        invalidRegisterYearOfExpirence.value = true
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid year of experience', life: 3000 });
+        return true;
+    } else invalidRegisterYearOfExpirence.value = false;
     return false;
 }
 
@@ -117,14 +140,17 @@ const clientRegister = () => {
 
     if (validateClientRegisterRequest()) return;
 
-    axios.post(constants.CLIENT_REGISTER, registerRequest).then((response) => {
+    axios.post(constants.ENGINEER_SIGNUP, registerRequest).then((response) => {
         if (response.status === 200) {
             login.value = true;
             clearRegisterForm();
             sticky.value = true;
         }
     }).catch((error) => {
-        toast.add({ severity: 'error', summary: 'Error Message', detail: 'Email or Phone already exists.', life: 3000 });
+        if (error.response.status === 400)
+            toast.add({ severity: 'error', summary: 'Engineer Register', detail: 'Engineer already exists.', life: 3000 });
+        else
+            toast.add({ severity: 'warn', summary: 'Engineer Register', detail: 'Something went wrong.', life: 3000 });
         console.error(error);
     });
 }
@@ -133,11 +159,11 @@ const clientLogin = () => {
 
     if (validateClientLoginRequest()) return;
 
-    axios.post(constants.CLIENT_LOGIN, loginRequest).then((response) => {
+    axios.post(constants.ENGINEER_LOGIN, loginRequest).then((response) => {
         if (response.status === 200) {
             toast.add({ severity: 'success', summary: 'Success Message', detail: 'Login Success.', life: 3000 });
             setTimeout(() => {
-                router.push('/home');
+                router.push('/engineer/home');
             }, 500);
         }
     }).catch((error) => {
@@ -145,6 +171,10 @@ const clientLogin = () => {
         console.error(error);
     });
 }
+
+onMounted(() => {
+    axios.get(constants.ENGINEER_LOGOUT).then(() => { }).catch((error) => { console.error(error) });
+})
 
 </script>
 
@@ -199,6 +229,16 @@ const clientLogin = () => {
                 <InputIcon class="pi pi-phone"> </InputIcon>
                 <InputText v-model="registerRequest.phone" placeholder="Phone" type="text"
                     :invalid="invalidRegisterPhone" />
+            </IconField>
+            <IconField iconPosition="left">
+                <InputIcon class="pi pi-receipt"> </InputIcon>
+                <InputText v-model="registerRequest.jobTitle" placeholder="Job Title" type="text"
+                    :invalid="invalidRegisterJobTitle" />
+            </IconField>
+            <IconField iconPosition="left">
+                <InputIcon class="pi pi-wrench"> </InputIcon>
+                <InputText v-model="registerRequest.yearOfExperience" placeholder="Year of experience" type="text"
+                    :invalid="invalidRegisterYearOfExpirence" />
             </IconField>
             <div class="card flex justify-content-center">
                 <Button type="button" label="Register" @click="clientRegister()" class="md:w-19rem w-full" />

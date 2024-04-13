@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
@@ -14,15 +14,13 @@ const loading = ref(true);
 const confirm = useConfirm();
 const toast = useToast();
 const dataTable = ref('projects')
-const dt = ref();
-const products = ref();
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
 const project = ref({});
-const selectedProducts = ref();
 const submitted = ref(false);
 const allProjects = ref([]);
+const loggedUserName = ref('')
 
 // create project
 const projectDescription = ref('')
@@ -35,6 +33,65 @@ const errorProjectType = ref(false);
 const errorProjectName = ref(false);
 const errorProjectTimeline = ref(false);
 const errorProjectStyle = ref(false);
+
+const items = ref([
+    {
+        separator: true
+    },
+    {
+        label: 'Menu',
+        items: [
+            {
+                label: 'Projects',
+                icon: 'pi pi-receipt',
+                badge: computed(() => allProjects.value.length),
+                command: () => {
+                    changeDataTable('projects');
+                }
+            },
+            {
+                label: 'Plans',
+                icon: 'pi pi-eject',
+                badge: 2,
+                command: () => {
+                    changeDataTable('plans');
+                }
+            },
+            {
+                label: '3D Models',
+                icon: 'pi pi-objects-column',
+                badge: 1,
+                command: () => {
+                    changeDataTable('models');
+                }
+            }
+        ]
+    },
+    {
+        label: 'Profile',
+        items: [
+            {
+                label: computed(() => loggedUserName.value),
+                icon: 'pi pi-user'
+            },
+            // {
+            //     label: 'Messages',
+            //     icon: 'pi pi-inbox',
+            //     badge: 2
+            // },
+            {
+                label: 'Logout',
+                icon: 'pi pi-sign-out',
+                command: () => {
+                    logout();
+                }
+            }
+        ]
+    },
+    {
+        separator: true
+    }
+]);
 
 
 const projectStyle = ref([
@@ -59,9 +116,16 @@ const projectType = ref([
 ])
 
 
-const details = [
+onMounted(() => {
+    axios.get(constants.CLIENT_PROFILE_URL).then((res) => {
+        loggedUserName.value = res.data.name;
+    }).catch((error) => {
+        console.error(error)
+        router.push('/')
+    });
+    getAllProjects();
+})
 
-]
 
 const clearCreateProject = () => {
     projectDescription.value = ''
@@ -69,36 +133,36 @@ const clearCreateProject = () => {
     style.value = ''
     projectTimeline.value = '1'
     projectName.value = ''
+    errroProjectDescription.value = false;
+    errorProjectType.value = false;
+    errorProjectName.value = false;
+    errorProjectTimeline.value = false;
+    errorProjectStyle.value = false;
 }
 
 const validateSaveProject = () => {
     if (projectName.value === null || projectName.value === '') {
         errorProjectName.value = true;
-        toast.add({ severity: 'warn', summary: 'Create project', detail: 'Fill the fileds', life: 3000 });
         return true;
     }
     else errorProjectName.value = false;
     if (projectDescription.value === null || projectDescription.value === '') {
         errroProjectDescription.value = true;
-        toast.add({ severity: 'warn', summary: 'Create project', detail: 'Fill the fileds', life: 3000 });
         return true;
     }
     else errroProjectDescription.value = false;
     if (type.value === null || type.value === '') {
         errorProjectType.value = true;
-        toast.add({ severity: 'warn', summary: 'Create project', detail: 'Fill the fileds', life: 3000 });
         return true;
     }
     else errorProjectType.value = false;
     if (style.value === null || style.value === '') {
         errorProjectStyle.value = true;
-        toast.add({ severity: 'warn', summary: 'Create project', detail: 'Fill the fileds', life: 3000 });
         return true;
     }
     else errorProjectStyle.value = false;
-    if (projectTimeline.value === null || projectTimeline.value === '' || projectTimeline.value === 0) {
+    if (projectTimeline.value === null || projectTimeline.value === '' || projectTimeline.value <= 0) {
         errorProjectTimeline.value = true;
-        toast.add({ severity: 'warn', summary: 'Create project', detail: 'Fill the fileds', life: 3000 });
         return true;
     }
     else errorProjectTimeline.value = false;
@@ -114,7 +178,6 @@ const getAllProjects = () => {
         console.error(error);
     });
 }
-getAllProjects();
 
 
 const saveProject = () => {
@@ -239,7 +302,6 @@ const data = [
 onMounted(() => {
     customers.value = data;
     loading.value = false;
-    products.value = details;
 });
 
 
@@ -248,70 +310,12 @@ const changeDataTable = (data) => {
 }
 
 const logout = () => {
-    axios.post(constants.CLIENT_LOGOUT).then((response) => {
+    axios.get(constants.CLIENT_LOGOUT).then((response) => {
         if (response.status === 200)
             router.push('/')
     }).catch((error) => { console.error(error) });
 }
 
-const items = ref([
-    {
-        separator: true
-    },
-    {
-        label: 'Menu',
-        items: [
-            {
-                label: 'Projects',
-                icon: 'pi pi-receipt',
-                badge: computed(() => allProjects.value.length),
-                command: () => {
-                    changeDataTable('projects');
-                }
-            },
-            {
-                label: 'Plans',
-                icon: 'pi pi-eject',
-                badge: 2,
-                command: () => {
-                    changeDataTable('plans');
-                }
-            },
-            {
-                label: '3D Models',
-                icon: 'pi pi-objects-column',
-                badge: 1,
-                command: () => {
-                    changeDataTable('models');
-                }
-            }
-        ]
-    },
-    {
-        label: 'Profile',
-        items: [
-            {
-                label: 'Arjun Shaji',
-                icon: 'pi pi-user'
-            },
-            // {
-            //     label: 'Messages',
-            //     icon: 'pi pi-inbox',
-            //     badge: 2
-            // },
-            {
-                label: 'Logout',
-                icon: 'pi pi-sign-out',
-                command: () => {
-                    logout();
-                }
-            }
-        ]
-    },
-    {
-        separator: true
-    }
-]);
 
 const confirm1 = () => {
     confirm.require({
@@ -393,7 +397,7 @@ const confirm2 = () => {
                                 <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" />
                             </template> -->
                     </Toolbar>
-                    <DataTable :value="allProjects">
+                    <DataTable :value="allProjects" scrollable scrollHeight="600px">
                         <Toast />
                         <ConfirmDialog></ConfirmDialog>
                         <Column field="name" header="Project Name" style="min-width:12rem">
@@ -460,13 +464,13 @@ const confirm2 = () => {
                         <label for="name">Project Name</label>
                         <InputText id="name" v-model.trim="projectName" required="true" autofocus
                             :invalid="errorProjectName" />
-                        <!-- <small class="p-error" v-if="submitted && !project.name">Name is required.</small> -->
+                        <small class="p-error" v-if="errorProjectName">Project name is required.</small>
                     </div>
                     <div class="field">
                         <label for="description">Description</label>
                         <Textarea :invalid="errroProjectDescription" id="description" v-model.trim="projectDescription"
                             required="true" rows="3" cols="20" />
-                        <!-- <small class="p-error" v-if="submitted && !project.description">Name is required.</small> -->
+                        <small class="p-error" v-if="errroProjectDescription">Description is required.</small>
                     </div>
 
                     <div class="field">
@@ -482,6 +486,7 @@ const confirm2 = () => {
                                 </span>
                             </template>
                         </Dropdown>
+                        <small class="p-error" v-if="errorProjectType">Type is required.</small>
                     </div>
 
                     <div class="field">
@@ -497,13 +502,15 @@ const confirm2 = () => {
                                 </span>
                             </template>
                         </Dropdown>
+                        <small class="p-error" v-if="errorProjectStyle">Architecture style is required.</small>
                     </div>
 
                     <div class="field">
                         <label for="name">Timeline ( Days )</label>
                         <InputNumber id="name" v-model.trim="projectTimeline" required="true" autofocus
-                            :invalid="errorProjectTimeline"/>
-                        <!-- <small class="p-error" v-if="submitted && !project.name">Name is required.</small> -->
+                            :invalid="errorProjectTimeline" />
+                        <small class="p-error" v-if="errorProjectTimeline">Timeline must be greater than or equal to
+                            1.</small>
                     </div>
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />

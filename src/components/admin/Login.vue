@@ -12,8 +12,8 @@ const invalidEmial = ref(false);
 const invalidPassword = ref(false);
 
 const adminLoginRequest = {
-    email: '',
-    password: ''
+    email: 'admin@admin.com',
+    password: '123456'
 }
 
 onMounted(() => {
@@ -32,27 +32,27 @@ const adminLogin = () => {
         adminLoginRequest.email === '' ||
         !validateEmail(adminLoginRequest.email)) {
         invalidEmial.value = true
-        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid email or password', group: 'br', life: 3000 });
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid email or password', life: 3000 });
         return;
     } else invalidEmial.value = false;
 
     if (adminLoginRequest.password === null ||
         adminLoginRequest.password === '') {
         invalidPassword.value = true;
-        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid email or password', group: 'br', life: 3000 });
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid email or password', life: 3000 });
         return;
     } else invalidPassword.value = false;
 
 
     axios.post(constants.ADMIN_LOGIN, adminLoginRequest).then((response) => {
         if (response.status === 200) {
-            toast.add({ severity: 'success', summary: 'Success Message', detail: 'Login Success.', group: 'br', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Admin Login', detail: 'Login Success.', life: 3000 });
             setTimeout(() => {
                 router.push('/admin/home');
             }, 500);
         }
     }).catch((error) => {
-        toast.add({ severity: 'error', summary: 'Error Message', detail: 'Bad Credentails.', group: 'br', life: 3000 });
+        toast.add({ severity: 'error', summary: 'Admin Login', detail: 'Bad Credentails.', life: 3000 });
         router.push('/admin');
         console.error(error);
     });
