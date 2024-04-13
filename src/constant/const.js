@@ -16,6 +16,7 @@ const CLIENT_LOGIN = BASE_URL + "/client/login"
 const CLIENT_LOGOUT = BASE_URL + '/client/logout'
 const CLIENT_CREATE_PROJECT = BASE_URL + '/client/project'
 const CLIENT_GET_PROJECT = BASE_URL + '/client/project'
+const CLIENT_DELETE_PROJECT = BASE_URL + '/client/project'
 
 
 export default {
@@ -29,5 +30,6 @@ export default {
     ADMIN_APPROVE_CLIENT,
     CLIENT_LOGOUT,
     CLIENT_CREATE_PROJECT,
-    CLIENT_GET_PROJECT
+    CLIENT_GET_PROJECT,
+    CLIENT_DELETE_PROJECT
 };
