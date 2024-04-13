@@ -11,10 +11,13 @@ axios.defaults.withCredentials = true;
 const router = useRouter();
 const clients = ref([]);
 const engineers = ref([]);
+const approvedEngineers = ref([]);
+const jobs = ref([]);
 const dataTable = ref('client')
 const confirm = useConfirm();
 const toast = useToast();
-
+const visible = ref(false);
+const assingSelectedEngineer = ref('')
 
 const getAllClients = () => {
     axios.get(constants.ADMIN_GET_ALL_CLIETNS).then((response) => {
@@ -31,6 +34,26 @@ const getAllEngineers = () => {
     axios.get(constants.ADMIN_GET_ALL_ENGINEERS).then((response) => {
         if (response.status === 200) {
             engineers.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+const getAllApprovedEngineers = () => {
+    axios.get(constants.ADMIN_APPROVED_ENGINEERS).then((response) => {
+        if (response.status === 200) {
+            approvedEngineers.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+const getAllJobs = () => {
+    axios.get(constants.ADMIN_GET_JOBS).then((response) => {
+        if (response.status === 200) {
+            jobs.value = response.data;
         }
     }).catch((error) => {
         console.error(error);
@@ -148,6 +171,24 @@ const confirm2 = (id) => {
     });
 };
 
+const assingEngineer = (id) => {
+
+
+    axios.post(constants.ADMIN_ASSIGN_ENGINEER, {
+        engineer: assingSelectedEngineer.value,
+        projectId: id
+    }).then((response) => {
+        if (response.status === 200) {
+            visible.value = false;
+            toast.add({ severity: 'success', summary: 'Assing Engineer', detail: 'Engineer assigned', life: 3000 });
+            getAllJobs();
+            getAllApprovedEngineers();
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
 const isButtonDisabled = (status) => {
     return status !== 'PENDING';
 }
@@ -185,9 +226,11 @@ const items = ref([
     {
         label: 'Assing Job',
         icon: 'pi pi-link',
-        // command: () => {
-        //     changeDataTable('assign_job');
-        // }
+        command: () => {
+            getAllJobs();
+            getAllApprovedEngineers();
+            changeDataTable('jobs');
+        }
     },
     {
         label: 'Feedback',
@@ -287,7 +330,72 @@ const getSeverity = (status) => {
                         <Tag :value="slotProps.data.status" :severity="getSeverity(slotProps.data.status)" />
                     </template>
                 </Column>
-                <template #footer> In total there are {{ clients ? clients.length : 0 }} clients. </template>
+                <template #footer> In total there are {{ engineers ? engineers.length : 0 }} eningneers. </template>
+            </DataTable>
+        </div>
+    </div>
+
+    <div class="client-details mt-5" v-else-if="dataTable === 'jobs'">
+        <div class="card">
+            <Toast />
+            <ConfirmDialog></ConfirmDialog>
+            <DataTable :value="jobs" tableStyle="min-width: 50rem" scrollable scrollHeight="600px">
+                <Column field="name" header="Project Name"></Column>
+                <Column field="type" header="Type"></Column>
+                <Column field="architectureStyle" header="Style"></Column>
+                <Column field="timeline" header="Timeline" style="min-width:12rem">
+                    <template #body="slotProps">
+                        <span>{{ slotProps.data.timeline }} days</span>
+                    </template>
+                </Column>
+                <Column field="phone" header="Assign Engineer" style="min-width: 12rem">
+                    <template #body="slotProps">
+                        <div class="card flex">
+                            <Button @click="visible = true" label="Assign" outlined></Button>
+
+                            <Dialog v-model:visible="visible" modal header="Assign Engineer"
+                                :style="{ width: '25rem' }">
+                                <div class="flex gap-2">
+                                    <div class="card">
+                                        <Dropdown v-model="assingSelectedEngineer" :options="approvedEngineers"
+                                            optionLabel="name" optionValue="id" placeholder="Select an engineer"
+                                            class="w-full md:w-14rem" />
+                                    </div>
+                                    <Button type="button" label="Assign"
+                                        @click="assingEngineer(slotProps.data.id)"></Button>
+                                </div>
+                            </Dialog>
+                        </div>
+                    </template>
+                </Column>
+                <!-- <Column field="timeline" header="Upload Plan" style="min-width:12rem">
+                    <template #body="slotProps">
+                        <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" :maxFileSize="1000000" @upload="onUpload" />
+                    </template>
+                </Column>
+                <Column field="timeline" header="Upload 3D Model" style="min-width:12rem">
+                    <template #body="slotProps">
+                        <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" :maxFileSize="1000000" @upload="onUpload" />
+                    </template>
+                </Column> -->
+                <!-- <Column header="Accept">
+                    <template #body="slotProps">
+                        <Button label="Accept" outlined @click="approveEngineer(slotProps.data.id)"
+                            :disabled="isButtonDisabled(slotProps.data.status)" />
+                    </template>
+                </Column>
+                <Column header="Reject">
+                    <template #body="slotProps">
+                        <Button label="Reject" severity="danger" :disabled="isButtonDisabled(slotProps.data.status)"
+                            @click="rejectEngineer(slotProps.data.id)" outlined />
+                    </template>
+                </Column> -->
+                <Column header="Status">
+                    <template #body="slotProps">
+                        <Tag :value="slotProps.data.status" :severity="getSeverity(slotProps.data.status)" />
+                    </template>
+                </Column>
+                <template #footer> In total there are {{ jobs ? jobs.length : 0 }} jobs. </template>
             </DataTable>
         </div>
     </div>

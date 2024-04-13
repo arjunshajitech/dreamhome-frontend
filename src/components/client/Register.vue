@@ -25,8 +25,8 @@ const registerRequest = {
 }
 
 const loginRequest = {
-    email: '',
-    password: ''
+    email: 'c@gmail.com',
+    password: '111'
 }
 
 const clearLoginForm = () => {

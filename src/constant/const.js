@@ -11,6 +11,9 @@ const ADMIN_GET_ALL_CLIETNS = BASE_URL + '/admin/clients'
 const ADMIN_APPROVE_CLIENT = BASE_URL + '/admin/approve/client'
 const ADMIN_GET_ALL_ENGINEERS = BASE_URL + '/admin/engineers'
 const ADMIN_APPROVE_ENGINEER = BASE_URL + '/admin/approve/engineer'
+const ADMIN_GET_JOBS = BASE_URL + '/admin/jobs'
+const ADMIN_APPROVED_ENGINEERS = BASE_URL + '/admin/engineers/approved'
+const ADMIN_ASSIGN_ENGINEER = BASE_URL + '/admin/assign'
 
 
 const CLIENT_REGISTER = BASE_URL + "/client/signup"
@@ -25,6 +28,7 @@ const ENGINEER_LOGIN = BASE_URL + '/engineer/login'
 const ENGINEER_SIGNUP = BASE_URL + '/engineer/signup'
 const ENGINEER_LOGOUT = BASE_URL + '/engineer/logout'
 const ENGINEER_PROFILE = BASE_URL + '/engineer/profile'
+const ENGINEER_JOBS = BASE_URL + '/engineer/jobs'
 
 
 export default {
@@ -46,5 +50,9 @@ export default {
     ENGINEER_PROFILE,
     ENGINEER_SIGNUP,
     ADMIN_GET_ALL_ENGINEERS,
-    ADMIN_APPROVE_ENGINEER
+    ADMIN_APPROVE_ENGINEER,
+    ADMIN_GET_JOBS,
+    ADMIN_APPROVED_ENGINEERS,
+    ADMIN_ASSIGN_ENGINEER,
+    ENGINEER_JOBS
 };

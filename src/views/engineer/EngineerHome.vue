@@ -1,9 +1,9 @@
 <script setup>
-import Header from '../../components/engineer/Header.vue'
+import Home from '@/components/engineer/Home.vue';
 
 
 </script>
 
 <template>
-    <Header />
+    <Home />
 </template>
