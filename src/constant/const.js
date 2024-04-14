@@ -32,9 +32,17 @@ const ENGINEER_JOBS = BASE_URL + '/engineer/jobs'
 const ENGINEER_UPDATE_PROJECT = BASE_URL + '/engineer/project'
 const ENGINEER_UPLOAD_IMAGE = BASE_URL + '/engineer/plan'
 const ENGINEER_UPLOAD_MODEL = BASE_URL + '/engineer/model'
+const ENGINEER_ALL_PLAN_IMAGES = BASE_URL + '/engineer/plan/image/all'
+const ENGINEER_ALL_MODEL_IMAGES = BASE_URL + '/engineer/model/image/all'
+const ENGINEER_DELETE_PLAN_IMAGE = BASE_URL + '/engineer/plan'
+const ENGINEER_DELETE_MODEL_IMAGE = BASE_URL + '/engineer/model'
 
 
 export default {
+    ENGINEER_DELETE_PLAN_IMAGE,
+    ENGINEER_DELETE_MODEL_IMAGE,
+    ENGINEER_ALL_MODEL_IMAGES,
+    ENGINEER_ALL_PLAN_IMAGES,
     FRONT_END_BASE_URL,
     ADMIN_GET_PROFILE,
     ADMIN_LOGIN,

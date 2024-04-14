@@ -19,8 +19,11 @@ const project = ref({});
 const submitted = ref(false);
 const loggedUserName = ref('')
 const jobs = ref([]);
+const planImages = ref([]);
+const modelImages = ref([]);
 const uploadPlan = ref(false);
 const uploadModel = ref(false)
+const visible = ref(false);
 
 
 const planAmount = ref('100')
@@ -44,6 +47,26 @@ const getAllJobs = () => {
     });
 }
 
+const getAllPlanImages = () => {
+    axios.get(constants.ENGINEER_ALL_PLAN_IMAGES).then((response) => {
+        if (response.status === 200) {
+            planImages.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+const getAllModelImges = () => {
+    axios.get(constants.ENGINEER_ALL_MODEL_IMAGES).then((response) => {
+        if (response.status === 200) {
+            modelImages.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
 
 onMounted(() => {
     axios.get(constants.ENGINEER_PROFILE).then((res) => {
@@ -53,6 +76,8 @@ onMounted(() => {
         router.push('/engineer')
     });
     getAllJobs();
+    getAllModelImges();
+    getAllPlanImages();
 })
 
 
@@ -184,26 +209,7 @@ const checkIsEditDeleteButtonDisable = (status) => {
     }
 }
 
-const data = [
-    {
-        id: 1000,
-        name: 'ammu',
-        country: {
-            name: 'Algeria',
-            code: 'dz'
-        },
-        company: 'Benton, John B Jr',
-        date: '2015-09-13',
-        status: 'unqualified',
-        verified: true,
-        activity: 17,
-        representative: {
-            name: 'Ioni Bowcher',
-            image: 'ionibowcher.png'
-        },
-        balance: 70663
-    }
-]
+
 
 const changeDataTable = (data) => {
     dataTable.value = data;
@@ -216,41 +222,6 @@ const logout = () => {
     }).catch((error) => { console.error(error) });
 }
 
-
-const confirm1 = () => {
-    confirm.require({
-        message: 'Are you sure you want to accept?',
-        header: 'Confirmation',
-        icon: 'pi pi-exclamation-triangle',
-        rejectClass: 'p-button-secondary p-button-outlined',
-        rejectLabel: 'Cancel',
-        acceptLabel: 'Accept',
-        accept: () => {
-            toast.add({ severity: 'success', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
-        },
-        reject: () => {
-            toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have cancelled', life: 3000 });
-        }
-    });
-};
-
-const confirm2 = () => {
-    confirm.require({
-        message: 'Are you sure you want to reject?',
-        header: 'Danger Zone',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        acceptLabel: 'Reject',
-        rejectClass: 'p-button-secondary p-button-outlined',
-        acceptClass: 'p-button-danger',
-        accept: () => {
-            toast.add({ severity: 'success', summary: 'Confirmed', detail: 'You have rejected', life: 3000 });
-        },
-        reject: () => {
-            toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have cancelled', life: 3000 });
-        }
-    });
-};
 
 const checkUpdateButtonDisable = (slotProps) => {
     return slotProps.data.planAmount != 0 && slotProps.data.threeDModelAmount != 0
@@ -275,16 +246,18 @@ const items = ref([
             {
                 label: 'Plans status',
                 icon: 'pi pi-eject',
-                badge: 2,
+                badge: computed(() => planImages.value.length),
                 command: () => {
+                    getAllPlanImages();
                     changeDataTable('plans');
                 }
             },
             {
                 label: '3D Models status',
                 icon: 'pi pi-objects-column',
-                badge: 1,
+                badge: computed(() => modelImages.value.length),
                 command: () => {
+                    getAllModelImges();
                     changeDataTable('models');
                 }
             }
@@ -330,6 +303,7 @@ const uploadModelImage = async (event) => {
         if (response.status === 200) {
             uploadModel.value = false;
             getAllJobs();
+            getAllModelImges();
             toast.add({ severity: 'success', summary: 'Upload Model', detail: 'Upload success.', life: 3000 });
         }
     }).catch((error) => {
@@ -352,10 +326,61 @@ const uploadPlanImage = async (event) => {
         if (response.status === 200) {
             uploadPlan.value = false;
             getAllJobs();
+            getAllPlanImages();
             toast.add({ severity: 'success', summary: 'Upload Plan', detail: 'Upload success.', life: 3000 });
         }
     }).catch((error) => {
         console.error(error);
+    });
+};
+
+const deleteModelImage = (id) => {
+    confirm.require({
+        message: 'Are you sure you want to delete model?',
+        header: 'Danger Zone',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        acceptLabel: 'Delete',
+        rejectClass: 'p-button-secondary p-button-outlined',
+        acceptClass: 'p-button-danger',
+        accept: () => {
+            axios.delete(constants.ENGINEER_DELETE_MODEL_IMAGE + "/" + id).then((response) => {
+                if (response.status === 200) {
+                    getAllModelImges();
+                    toast.add({ severity: 'success', summary: 'Delete Model Image', detail: 'Delete success.', life: 3000 });
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+        },
+        reject: () => {
+            toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have cancelled', life: 3000 });
+        }
+    });
+};
+
+const deletePlanImage = (id) => {
+    confirm.require({
+        message: 'Are you sure you want to delete plan?',
+        header: 'Danger Zone',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        acceptLabel: 'Delete',
+        rejectClass: 'p-button-secondary p-button-outlined',
+        acceptClass: 'p-button-danger',
+        accept: () => {
+            axios.delete(constants.ENGINEER_DELETE_PLAN_IMAGE + "/" + id).then((response) => {
+                if (response.status === 200) {
+                    getAllPlanImages();
+                    toast.add({ severity: 'success', summary: 'Delete Plan Image', detail: 'Delete success.', life: 3000 });
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+        },
+        reject: () => {
+            toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have cancelled', life: 3000 });
+        }
     });
 };
 
@@ -490,6 +515,92 @@ const uploadPlanImage = async (event) => {
             </Dialog>
 
         </div>
+
+
+        <div class="plans" v-if="dataTable === 'plans'">
+            <div class="card">
+                <DataTable :value="planImages" scrollable scrollHeight="600px">
+                    <Toast />
+                    <ConfirmDialog></ConfirmDialog>
+                    <Column field="name" header="Project Name" style="min-width:12rem"></Column>
+                    <Column field="type" header="Type" style="min-width:12rem"></Column>
+                    <Column header="Status" style="min-width:12rem">
+                        <template #body="slotProps">
+                            <Tag :value="slotProps.data.status" severity="warning" />
+                        </template>
+                    </Column>
+                    <Column field="reason" header="Reason" style="min-width:12rem"></Column>
+                    <Column :exportable="false" header="image" style="min-width:8rem">
+                        <template #body="slotProps">
+                            <Button label="Show Image" @click="visible = true" />
+                            <Dialog v-model:visible="visible" modal header="Image" :style="{ width: '50rem' }"
+                                :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+                                <p class="mb-5">
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                                    exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                                    dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+                                    sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                </p>
+                            </Dialog>
+                        </template>
+                    </Column>
+                    <Column :exportable="false" style="min-width:8rem">
+                        <template #body="slotProps">
+                            <Button icon="pi pi-trash" outlined rounded severity="danger"
+                                @click="deletePlanImage(slotProps.data.imageId)"
+                                :disabled="slotProps.data.status == PENDING" />
+                        </template>
+                    </Column>
+                    <template #footer> In total there are {{ planImages ? planImages.length : 0 }} jobs.
+                    </template>
+                </DataTable>
+            </div>
+        </div>
+
+        <div class="plans" v-if="dataTable === 'models'">
+            <div class="card">
+                <DataTable :value="modelImages" scrollable scrollHeight="600px">
+                    <Toast />
+                    <ConfirmDialog></ConfirmDialog>
+                    <Column field="name" header="Project Name" style="min-width:12rem"></Column>
+                    <Column field="type" header="Type" style="min-width:12rem"></Column>
+                    <Column header="Status" style="min-width:12rem">
+                        <template #body="slotProps">
+                            <Tag :value="slotProps.data.status" severity="warning" />
+                        </template>
+                    </Column>
+                    <Column field="reason" header="Reason" style="min-width:12rem"></Column>
+                    <Column :exportable="false" header="image" style="min-width:8rem">
+                        <template #body="slotProps">
+                            <Button label="Show Image" @click="visible = true" />
+                            <Dialog v-model:visible="visible" modal header="Image" :style="{ width: '50rem' }"
+                                :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+                                <p class="mb-5">
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                                    exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                                    dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+                                    sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                </p>
+                            </Dialog>
+                        </template>
+                    </Column>
+                    <Column :exportable="false" style="min-width:8rem">
+                        <template #body="slotProps">
+                            <Button icon="pi pi-trash" outlined rounded severity="danger"
+                                @click="deleteModelImage(slotProps.data.imageId)"
+                                :disabled="slotProps.data.status == PENDING" />
+                        </template>
+                    </Column>
+                    <template #footer> In total there are {{ modelImages ? modelImages.length : 0 }} jobs.
+                    </template>
+                </DataTable>
+            </div>
+        </div>
+
     </div>
 
 </template>

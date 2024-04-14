@@ -12,8 +12,8 @@ const invalidEmial = ref(false);
 const invalidPassword = ref(false);
 
 const adminLoginRequest = {
-    email: 'admin@admin.com',
-    password: '123456'
+    email: '',
+    password: ''
 }
 
 onMounted(() => {
