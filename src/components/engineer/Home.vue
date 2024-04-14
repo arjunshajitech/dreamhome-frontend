@@ -235,7 +235,7 @@ const items = ref([
         label: 'Menu',
         items: [
             {
-                label: 'Jobs',
+                label: 'Assigned Jobs',
                 icon: 'pi pi-receipt',
                 badge: computed(() => jobs.value.length),
                 command: () => {
@@ -244,7 +244,7 @@ const items = ref([
                 }
             },
             {
-                label: 'Plans status',
+                label: 'Plan images',
                 icon: 'pi pi-eject',
                 badge: computed(() => planImages.value.length),
                 command: () => {
@@ -253,7 +253,7 @@ const items = ref([
                 }
             },
             {
-                label: '3D Models status',
+                label: '3D Model images',
                 icon: 'pi pi-objects-column',
                 badge: computed(() => modelImages.value.length),
                 command: () => {

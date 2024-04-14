@@ -23,6 +23,10 @@ const CLIENT_DELETE_PROJECT = BASE_URL + '/client/project'
 const CLIENT_PROFILE_URL = BASE_URL + '/client/profile'
 const CLIENT_PAY_MODEL = BASE_URL + '/client/pay/model'
 const CLIENT_PAY_PLAN = BASE_URL + '/client/pay/plan'
+const CLIENT_ALL_PLAN_IMAGES = BASE_URL + '/client/plan/image/all'
+const CLIENT_ALL_MODEL_IMAGES = BASE_URL + '/client/model/image/all'
+const CLIENT_DOWNLOAD_PLAN = BASE_URL + '/client/download/plan'
+const CLIENT_DOWNLOAD_MODEL = BASE_URL + '/client/download/model'
 
 const ENGINEER_LOGIN = BASE_URL + '/engineer/login'
 const ENGINEER_SIGNUP = BASE_URL + '/engineer/signup'
@@ -39,6 +43,11 @@ const ENGINEER_DELETE_MODEL_IMAGE = BASE_URL + '/engineer/model'
 
 
 export default {
+    BASE_URL,
+    CLIENT_DOWNLOAD_MODEL,
+    CLIENT_DOWNLOAD_PLAN,
+    CLIENT_ALL_MODEL_IMAGES,
+    CLIENT_ALL_PLAN_IMAGES,
     ENGINEER_DELETE_PLAN_IMAGE,
     ENGINEER_DELETE_MODEL_IMAGE,
     ENGINEER_ALL_MODEL_IMAGES,
