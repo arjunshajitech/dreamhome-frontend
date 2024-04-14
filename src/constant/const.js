@@ -30,6 +30,8 @@ const ENGINEER_LOGOUT = BASE_URL + '/engineer/logout'
 const ENGINEER_PROFILE = BASE_URL + '/engineer/profile'
 const ENGINEER_JOBS = BASE_URL + '/engineer/jobs'
 const ENGINEER_UPDATE_PROJECT = BASE_URL + '/engineer/project'
+const ENGINEER_UPLOAD_IMAGE = BASE_URL + '/engineer/plan'
+const ENGINEER_UPLOAD_MODEL = BASE_URL + '/engineer/model'
 
 
 export default {
@@ -58,5 +60,7 @@ export default {
     ENGINEER_JOBS,
     ENGINEER_UPDATE_PROJECT,
     CLIENT_PAY_MODEL,
-    CLIENT_PAY_PLAN
+    CLIENT_PAY_PLAN,
+    ENGINEER_UPLOAD_IMAGE,
+    ENGINEER_UPLOAD_MODEL
 };

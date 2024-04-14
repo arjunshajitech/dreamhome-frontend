@@ -29,6 +29,9 @@ const errorPlanAmount = ref(false)
 const errorThreeDModel = ref(false)
 const updateProjectId = ref('');
 
+const planUploadProjectId = ref('');
+const modelUploadProjectId = ref('');
+
 
 
 const getAllJobs = () => {
@@ -101,7 +104,6 @@ const saveProject = () => {
 
 
 
-
 const openNew = (id) => {
     clearUpdateProject();
     updateProjectId.value = id;
@@ -111,10 +113,12 @@ const openNew = (id) => {
 };
 
 const uploadPlanOpen = (id) => {
+    planUploadProjectId.value = id;
     uploadPlan.value = true;
 }
 
 const uploadModelOpen = (id) => {
+    modelUploadProjectId.value = id;
     uploadModel.value = true;
 }
 
@@ -312,6 +316,49 @@ const items = ref([
     }
 ]);
 
+const uploadModelImage = async (event) => {
+    let projectId = modelUploadProjectId.value;
+    const file = event.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    axios.post(constants.ENGINEER_UPLOAD_MODEL + "/" + projectId, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }).then((response) => {
+        if (response.status === 200) {
+            uploadModel.value = false;
+            getAllJobs();
+            toast.add({ severity: 'success', summary: 'Upload Model', detail: 'Upload success.', life: 3000 });
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+};
+
+
+const uploadPlanImage = async (event) => {
+    let projectId = planUploadProjectId.value;
+    const file = event.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    axios.post(constants.ENGINEER_UPLOAD_IMAGE + "/" + projectId, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }).then((response) => {
+        if (response.status === 200) {
+            uploadPlan.value = false;
+            getAllJobs();
+            toast.add({ severity: 'success', summary: 'Upload Plan', detail: 'Upload success.', life: 3000 });
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+};
+
 </script>
 
 
@@ -345,16 +392,6 @@ const items = ref([
 
         <div class="plans" v-if="dataTable === 'jobs'">
             <div class="card">
-                <!-- <Toolbar class="mb-4">
-                        <template #start>
-                            <Button label="Create" icon="pi pi-plus" severity="success" class="mr-2"
-                                @click="openNew()" />
-                        </template>
-
-                        <template #end>
-                                <Button label="Export" icon="pi pi-upload" severity="help" @click="exportCSV($event)" />
-                            </template>
-                    </Toolbar> -->
                 <DataTable :value="jobs" scrollable scrollHeight="600px">
                     <Toast />
                     <ConfirmDialog></ConfirmDialog>
@@ -439,25 +476,17 @@ const items = ref([
             <Dialog v-model:visible="uploadPlan" :style="{ width: '450px' }" header="Upload plan" :modal="true"
                 class="p-fluid">
                 <div class="field card flex justify-content-center">
-                    <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" :maxFileSize="1000000"
-                        @upload="onUpload" />
+                    <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload
+                        @uploader="uploadPlanImage" />
                 </div>
-                <template #footer>
-                    <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                    <Button label="Upload" icon="pi pi-check" text @click="saveProject" />
-                </template>
             </Dialog>
 
             <Dialog v-model:visible="uploadModel" :style="{ width: '450px' }" header="Upload plan" :modal="true"
                 class="p-fluid">
                 <div class="field card flex justify-content-center">
-                    <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" :maxFileSize="1000000"
-                        @upload="onUpload" />
+                    <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload
+                        @uploader="uploadModelImage" />
                 </div>
-                <template #footer>
-                    <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
-                    <Button label="Upload" icon="pi pi-check" text @click="saveProject" />
-                </template>
             </Dialog>
 
         </div>
