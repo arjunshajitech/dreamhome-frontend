@@ -33,6 +33,7 @@ const CLIENT_MODEL_APPROVE = BASE_URL + '/client/model/approve-reject'
 const ENGINEER_LOGIN = BASE_URL + '/engineer/login'
 const ENGINEER_SIGNUP = BASE_URL + '/engineer/signup'
 const ENGINEER_LOGOUT = BASE_URL + '/engineer/logout'
+const ENGINEER_ACTIVE = BASE_URL + '/engineer/active'
 const ENGINEER_PROFILE = BASE_URL + '/engineer/profile'
 const ENGINEER_JOBS = BASE_URL + '/engineer/jobs'
 const ENGINEER_UPDATE_PROJECT = BASE_URL + '/engineer/project'
@@ -42,9 +43,14 @@ const ENGINEER_ALL_PLAN_IMAGES = BASE_URL + '/engineer/plan/image/all'
 const ENGINEER_ALL_MODEL_IMAGES = BASE_URL + '/engineer/model/image/all'
 const ENGINEER_DELETE_PLAN_IMAGE = BASE_URL + '/engineer/plan'
 const ENGINEER_DELETE_MODEL_IMAGE = BASE_URL + '/engineer/model'
+const ENGINEER_DOWNLOAD_PLAN = BASE_URL + '/engineer/download/plan'
+const ENGINEER_DOWNLOAD_MODEL = BASE_URL + '/engineer/download/model'
 
 
 export default {
+    ENGINEER_ACTIVE,
+    ENGINEER_DOWNLOAD_MODEL,
+    ENGINEER_DOWNLOAD_PLAN,
     CLIENT_PLAN_APPROVE,
     CLIENT_MODEL_APPROVE,
     BASE_URL,

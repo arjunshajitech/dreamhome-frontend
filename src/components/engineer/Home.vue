@@ -6,6 +6,7 @@ import { useToast } from "primevue/usetoast";
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import constants from '../../constant/const'
+import EngineerRegister from '@/views/engineer/EngineerRegister.vue';
 
 axios.defaults.withCredentials = true;
 const router = useRouter();
@@ -29,6 +30,9 @@ const errorThreeDModel = ref(false)
 const updateProjectId = ref('');
 const planUploadProjectId = ref('');
 const modelUploadProjectId = ref('');
+const viewModelImage = ref(false);
+const viewPlanImage = ref(false);
+const engineerActive = ref('');
 
 
 
@@ -65,6 +69,8 @@ const getAllModelImges = () => {
 const getProfile = () => {
     axios.get(constants.ENGINEER_PROFILE).then((res) => {
         loggedUserName.value = res.data.name;
+        if (res.data.active) engineerActive.value = 'ACTIVE'
+        else engineerActive.value = 'NOT ACTIVE'
     }).catch((error) => {
         console.error(error)
         router.push('/engineer')
@@ -164,6 +170,28 @@ const checkUpdateButtonDisable = (slotProps) => {
     return slotProps.data.planAmount != 0 && slotProps.data.threeDModelAmount != 0
 }
 
+const activeEngineer = () => {
+    if (engineerActive.value === 'ACTIVE') {
+        axios.post(constants.ENGINEER_ACTIVE + "/" + false).then((response) => {
+            if (response.status === 200) {
+                getProfile();
+                toast.add({ severity: 'success', summary: 'Status', detail: 'Not active updated.', life: 3000 });
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
+    } else {
+        axios.post(constants.ENGINEER_ACTIVE + "/" + true).then((response) => {
+            if (response.status === 200) {
+                getProfile();
+                toast.add({ severity: 'success', summary: 'Status', detail: 'Active updated.', life: 3000 });
+            }
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
+}
+
 const items = ref([
     {
         separator: true
@@ -206,6 +234,13 @@ const items = ref([
             {
                 label: computed(() => loggedUserName.value),
                 icon: 'pi pi-user'
+            },
+            {
+                label: computed(() => engineerActive.value),
+                icon: 'pi pi-thumbtack',
+                command: () => {
+                    activeEngineer();
+                }
             },
             {
                 label: 'Logout',
@@ -348,6 +383,46 @@ const modelGetSeverity = (status) => {
             return null;
     }
 }
+
+const viewImage = () => {
+    viewPlanImage.value = true
+}
+
+const downloadModelImage = (id) => {
+    axios.get(constants.ENGINEER_DOWNLOAD_MODEL + "/" + id).then((response) => {
+        if (response.status === 200) {
+            getAllModelImges();
+            var imageUrl = constants.BASE_URL + "/engineer/download/model/" + id;
+            console.log(imageUrl);
+            var link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = "model.jpg"
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+};
+
+const downloadPlanImage = (id) => {
+    axios.get(constants.ENGINEER_DOWNLOAD_PLAN + "/" + id).then((response) => {
+        if (response.status === 200) {
+            getAllPlanImages();
+            var imageUrl = constants.BASE_URL + "/engineer/download/plan/" + id;
+            console.log(imageUrl);
+            var link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = "plan.jpg"
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+};
 
 </script>
 
@@ -497,20 +572,25 @@ const modelGetSeverity = (status) => {
                     <Column field="reason" header="Reason" style="min-width:12rem"></Column>
                     <!-- <Column :exportable="false" header="image" style="min-width:8rem">
                         <template #body="slotProps">
-                            <Button label="Show Image" @click="visible = true" />
-                            <Dialog v-model:visible="visible" modal header="Image" :style="{ width: '50rem' }"
+                            <Button label="View" @click="viewImage()" outlined/>
+                            <Dialog v-model:visible="viewPlanImage" modal header="Image" :style="{ width: '50rem' }"
                                 :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                                <p class="mb-5">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                    exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                    dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                                    sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                </p>
+                                <div class="card flex justify-content-center">
+                                    <Image alt="Image">
+                                        <template #image>
+                                            <img src="https://primefaces.org/cdn/primevue/images/galleria/galleria11.jpg" alt="preview" :style="slotProps.style"/>
+                                        </template>
+                                    </Image>
+                                </div>
                             </Dialog>
                         </template>
                     </Column> -->
+                    <Column :exportable="false" style="min-width:8rem">
+                        <template #body="slotProps">
+                            <Button icon="pi pi-download" outlined rounded severity="success"
+                                @click="downloadPlanImage(slotProps.data.imageId)" />
+                        </template>
+                    </Column>
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button icon="pi pi-trash" outlined rounded severity="danger"
@@ -553,6 +633,13 @@ const modelGetSeverity = (status) => {
                             </Dialog>
                         </template>
                     </Column> -->
+                    <Column :exportable="false" style="min-width:8rem">
+                        <template #body="slotProps">
+                            <Button icon="pi pi-download" outlined rounded severity="success"
+                                @click="downloadModelImage(slotProps.data.imageId)"
+                                :disabled="slotProps.data.status == PENDING" />
+                        </template>
+                    </Column>
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button icon="pi pi-trash" outlined rounded severity="danger"

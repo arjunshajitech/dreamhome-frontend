@@ -232,14 +232,14 @@ const items = ref([
             changeDataTable('jobs');
         }
     },
-    {
-        label: 'Feedback',
-        icon: 'pi pi-inbox'
-    },
-    {
-        label: 'FAQ',
-        icon: 'pi pi-comments'
-    }
+    // {
+    //     label: 'Feedback',
+    //     icon: 'pi pi-inbox'
+    // },
+    // {
+    //     label: 'FAQ',
+    //     icon: 'pi pi-comments'
+    // }
 ]);
 
 const getSeverity = (status) => {
