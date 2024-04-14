@@ -9,8 +9,6 @@ import constants from '../../constant/const'
 
 axios.defaults.withCredentials = true;
 const router = useRouter();
-const customers = ref();
-const loading = ref(true);
 const confirm = useConfirm();
 const toast = useToast();
 const dataTable = ref('projects')
@@ -32,6 +30,15 @@ const errorProjectType = ref(false);
 const errorProjectName = ref(false);
 const errorProjectTimeline = ref(false);
 const errorProjectStyle = ref(false);
+const rejectPlanPopup = ref(false);
+const planReason = ref('')
+const errorPlanReason = ref(false);
+const rejectPlanId = ref('');
+const rejectModelId = ref('')
+const modelReason = ref('')
+const errorModelReason = ref(false);
+const rejectModelPopup = ref(false);
+
 
 const items = ref([
     {
@@ -441,28 +448,61 @@ const approveModel = (id) => {
     });
 };
 
-const rejectPlan = (id) => {
-    confirm.require({
-        message: 'Are you sure you want to reject?',
-        header: 'Danger Zone',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        acceptLabel: 'Reject',
-        rejectClass: 'p-button-secondary p-button-outlined',
-        acceptClass: 'p-button-danger',
-        accept: () => {
-            // axios.delete(constants.CLIENT_DELETE_PROJECT + "/" + id).then((response) => {
-            //     if (response.status === 200) {
-            //         getAllProjects();
-            //         toast.add({ severity: 'success', summary: 'Delete project', detail: 'Project deleted.', life: 3000 });
-            //     }
-            // }).catch((error) => {
-            //     console.error(error);
-            // });
-        },
-        reject: () => {
-            toast.add({ severity: 'info', summary: 'Reject plan', detail: 'You have cancelled', life: 3000 });
+const rejectPlanPoupOpen = (id) => {
+    rejectPlanPopup.value = true;
+    rejectPlanId.value = id;
+    planReason.value = ''
+}
+
+const rejectPlanPoupClose = () => {
+    rejectPlanPopup.value = false;
+    rejectPlanId.value = '';
+}
+
+const rejectModelPoupOpen = (id) => {
+    rejectModelPopup.value = true;
+    rejectModelId.value = id;
+    modelReason.value = ''
+}
+
+const rejectModelPoupClose = () => {
+    rejectModelPopup.value = false;
+    rejectModelId.value = '';
+}
+
+const rejectModel = () => {
+    axios.post(constants.CLIENT_MODEL_APPROVE, {
+        id: rejectModelId.value,
+        approve: false,
+        reason: modelReason.value
+    }).then((response) => {
+        if (response.status === 200) {
+            getAllModelImges();
+            rejectModelPopup.value = false;
+            rejectModelId.value = '';
+            modelReason.value = '';
+            toast.add({ severity: 'success', summary: 'Reject model', detail: 'Rejected Success.', life: 3000 });
         }
+    }).catch((error) => {
+        console.error(error);
+    });
+};
+
+const rejectPlan = () => {
+    axios.post(constants.CLIENT_PLAN_APPROVE, {
+        id: rejectPlanId.value,
+        approve: false,
+        reason: planReason.value
+    }).then((response) => {
+        if (response.status === 200) {
+            getAllPlanImages();
+            rejectPlanPopup.value = false;
+            rejectPlanId.value = '';
+            planReason.value = '';
+            toast.add({ severity: 'success', summary: 'Reject Plan', detail: 'Rejected Success.', life: 3000 });
+        }
+    }).catch((error) => {
+        console.error(error);
     });
 };
 
@@ -693,7 +733,7 @@ const modelGetSeverity = (status) => {
                 <DataTable :value="planImages" scrollable scrollHeight="600px">
                     <Toast />
                     <ConfirmDialog></ConfirmDialog>
-                    <Column field="name" header="Project Name" style="min-width:12rem"></Column>
+                    <Column field="projectName" header="Project Name" style="min-width:12rem"></Column>
                     <Column field="type" header="Type" style="min-width:12rem"></Column>
                     <Column header="Status" style="min-width:12rem">
                         <template #body="slotProps">
@@ -725,7 +765,21 @@ const modelGetSeverity = (status) => {
                     <Column header="Reject">
                         <template #body="slotProps">
                             <Button label="Reject" severity="danger" :disabled="slotProps.data.status != 'PENDING'"
-                                outlined @click="rejectPlan(slotProps.data.id)" />
+                                outlined @click="rejectPlanPoupOpen(slotProps.data.id)" />
+
+                            <Dialog v-model:visible="rejectPlanPopup" :style="{ width: '450px' }"
+                                header="Create Project" :modal="true" class="p-fluid">
+                                <div class="field">
+                                    <label for="description">Reason</label>
+                                    <Textarea :invalid="errorPlanReason" id="description" v-model.trim="planReason"
+                                        required="true" rows="3" cols="20" />
+                                    <small class="p-error" v-if="errorPlanReason">Reason is required.</small>
+                                </div>
+                                <template #footer>
+                                    <Button label="Cancel" icon="pi pi-times" text @click="rejectPlanPoupClose" />
+                                    <Button label="Save" icon="pi pi-check" text @click="rejectPlan" />
+                                </template>
+                            </Dialog>
                         </template>
                     </Column>
                     <Column :exportable="false" style="min-width:8rem">
@@ -746,7 +800,7 @@ const modelGetSeverity = (status) => {
                 <DataTable :value="modelImages" scrollable scrollHeight="600px">
                     <Toast />
                     <ConfirmDialog></ConfirmDialog>
-                    <Column field="name" header="Project Name" style="min-width:12rem"></Column>
+                    <Column field="projectName" header="Project Name" style="min-width:12rem"></Column>
                     <Column field="type" header="Type" style="min-width:12rem"></Column>
                     <Column header="Status" style="min-width:12rem">
                         <template #body="slotProps">
@@ -777,8 +831,22 @@ const modelGetSeverity = (status) => {
                     </Column>
                     <Column header="Reject">
                         <template #body="slotProps">
-                            <Button label="Reject" severity="danger" outlined
-                                :disabled="slotProps.data.status != 'PENDING'" />
+                            <Button label="Reject" severity="danger" :disabled="slotProps.data.status != 'PENDING'"
+                                outlined @click="rejectModelPoupOpen(slotProps.data.id)" />
+
+                            <Dialog v-model:visible="rejectModelPopup" :style="{ width: '450px' }"
+                                header="Reason" :modal="true" class="p-fluid">
+                                <div class="field">
+                                    <label for="description">Reason</label>
+                                    <Textarea :invalid="errorModelReason" id="description" v-model.trim="modelReason"
+                                        required="true" rows="3" cols="20" />
+                                    <small class="p-error" v-if="errorModelReason">Reason is required.</small>
+                                </div>
+                                <template #footer>
+                                    <Button label="Cancel" icon="pi pi-times" text @click="rejectModelPoupClose" />
+                                    <Button label="Save" icon="pi pi-check" text @click="rejectModel" />
+                                </template>
+                            </Dialog>
                         </template>
                     </Column>
                     <Column :exportable="false" style="min-width:8rem">

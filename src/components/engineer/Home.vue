@@ -316,6 +316,39 @@ const deletePlanImage = (id) => {
     });
 };
 
+const planGetSeverity = (status) => {
+    console.log(status);
+    switch (status) {
+        case 'APPROVED':
+            return 'success';
+
+        case 'PENDING':
+            return 'warning';
+
+        case 'REJECTED':
+            return 'danger';
+
+        default:
+            return null;
+    }
+}
+
+const modelGetSeverity = (status) => {
+    switch (status) {
+        case 'APPROVED':
+            return 'success';
+
+        case 'PENDING':
+            return 'warning';
+
+        case 'REJECTED':
+            return 'danger';
+
+        default:
+            return null;
+    }
+}
+
 </script>
 
 
@@ -454,15 +487,15 @@ const deletePlanImage = (id) => {
                 <DataTable :value="planImages" scrollable scrollHeight="600px">
                     <Toast />
                     <ConfirmDialog></ConfirmDialog>
-                    <Column field="name" header="Project Name" style="min-width:12rem"></Column>
+                    <Column field="projectName" header="Project Name" style="min-width:12rem"></Column>
                     <Column field="type" header="Type" style="min-width:12rem"></Column>
                     <Column header="Status" style="min-width:12rem">
                         <template #body="slotProps">
-                            <Tag :value="slotProps.data.status" severity="warning" />
+                            <Tag :value="slotProps.data.status" :severity="planGetSeverity(slotProps.data.status)" />
                         </template>
                     </Column>
                     <Column field="reason" header="Reason" style="min-width:12rem"></Column>
-                    <Column :exportable="false" header="image" style="min-width:8rem">
+                    <!-- <Column :exportable="false" header="image" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button label="Show Image" @click="visible = true" />
                             <Dialog v-model:visible="visible" modal header="Image" :style="{ width: '50rem' }"
@@ -477,12 +510,12 @@ const deletePlanImage = (id) => {
                                 </p>
                             </Dialog>
                         </template>
-                    </Column>
+                    </Column> -->
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button icon="pi pi-trash" outlined rounded severity="danger"
                                 @click="deletePlanImage(slotProps.data.imageId)"
-                                :disabled="slotProps.data.status == PENDING" />
+                                :disabled="slotProps.data.status === 'APPROVED'" />
                         </template>
                     </Column>
                     <template #footer> In total there are {{ planImages ? planImages.length : 0 }} plan images.
@@ -496,15 +529,15 @@ const deletePlanImage = (id) => {
                 <DataTable :value="modelImages" scrollable scrollHeight="600px">
                     <Toast />
                     <ConfirmDialog></ConfirmDialog>
-                    <Column field="name" header="Project Name" style="min-width:12rem"></Column>
+                    <Column field="projectName" header="Project Name" style="min-width:12rem"></Column>
                     <Column field="type" header="Type" style="min-width:12rem"></Column>
                     <Column header="Status" style="min-width:12rem">
                         <template #body="slotProps">
-                            <Tag :value="slotProps.data.status" severity="warning" />
+                            <Tag :value="slotProps.data.status" :severity="modelGetSeverity(slotProps.data.status)" />
                         </template>
                     </Column>
                     <Column field="reason" header="Reason" style="min-width:12rem"></Column>
-                    <Column :exportable="false" header="image" style="min-width:8rem">
+                    <!-- <Column :exportable="false" header="image" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button label="Show Image" @click="visible = true" />
                             <Dialog v-model:visible="visible" modal header="Image" :style="{ width: '50rem' }"
@@ -519,12 +552,12 @@ const deletePlanImage = (id) => {
                                 </p>
                             </Dialog>
                         </template>
-                    </Column>
+                    </Column> -->
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button icon="pi pi-trash" outlined rounded severity="danger"
                                 @click="deleteModelImage(slotProps.data.imageId)"
-                                :disabled="slotProps.data.status == PENDING" />
+                                :disabled="slotProps.data.status === 'APPROVED'" />
                         </template>
                     </Column>
                     <template #footer> In total there are {{ modelImages ? modelImages.length : 0 }} model images.
