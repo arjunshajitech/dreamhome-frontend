@@ -15,7 +15,6 @@ const confirm = useConfirm();
 const toast = useToast();
 const dataTable = ref('projects')
 const productDialog = ref(false);
-const deleteProductDialog = ref(false);
 const deleteProductsDialog = ref(false);
 const project = ref({});
 const submitted = ref(false);
@@ -23,9 +22,6 @@ const allProjects = ref([]);
 const loggedUserName = ref('')
 const planImages = ref([]);
 const modelImages = ref([]);
-const visible = ref(false);
-
-// create project
 const projectDescription = ref('')
 const type = ref('');
 const projectName = ref('')
@@ -80,11 +76,6 @@ const items = ref([
                 label: computed(() => loggedUserName.value),
                 icon: 'pi pi-user'
             },
-            // {
-            //     label: 'Messages',
-            //     icon: 'pi pi-inbox',
-            //     badge: 2
-            // },
             {
                 label: 'Logout',
                 icon: 'pi pi-sign-out',
@@ -121,18 +112,49 @@ const projectType = ref([
     }
 ])
 
-
-onMounted(() => {
+const getProfile = () => {
     axios.get(constants.CLIENT_PROFILE_URL).then((res) => {
         loggedUserName.value = res.data.name;
     }).catch((error) => {
         console.error(error)
         router.push('/')
     });
-    getAllProjects();
-    getAllModelImges();
-    getAllPlanImages();
-})
+}
+
+const getAllProjects = () => {
+    axios.get(constants.CLIENT_GET_PROJECT).then((response) => {
+        if (response.status === 200) {
+            allProjects.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+const getAllPlanImages = () => {
+    axios.get(constants.CLIENT_ALL_PLAN_IMAGES).then((response) => {
+        if (response.status === 200) {
+            planImages.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+const getAllModelImges = () => {
+    axios.get(constants.CLIENT_ALL_MODEL_IMAGES).then((response) => {
+        if (response.status === 200) {
+            modelImages.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+getProfile();
+getAllProjects();
+getAllModelImges();
+getAllPlanImages();
 
 
 const clearCreateProject = () => {
@@ -177,34 +199,45 @@ const validateSaveProject = () => {
 
 }
 
-const getAllProjects = () => {
-    axios.get(constants.CLIENT_GET_PROJECT).then((response) => {
-        if (response.status === 200) {
-            allProjects.value = response.data;
-        }
-    }).catch((error) => {
-        console.error(error);
-    });
+const openNew = () => {
+    clearCreateProject();
+    project.value = {};
+    submitted.value = false;
+    productDialog.value = true;
+};
+const hideDialog = () => {
+    productDialog.value = false;
+    submitted.value = false;
+};
+
+const getSeverity = (status) => {
+    switch (status) {
+        case 'ASSIGNED':
+            return 'success';
+
+        case 'UNASSIGNED':
+            return 'warning';
+
+        default:
+            return null;
+    }
+};
+
+const changeDataTable = (data) => {
+    dataTable.value = data;
 }
 
-const getAllPlanImages = () => {
-    axios.get(constants.CLIENT_ALL_PLAN_IMAGES).then((response) => {
-        if (response.status === 200) {
-            planImages.value = response.data;
-        }
-    }).catch((error) => {
-        console.error(error);
-    });
-}
+const checkIsEditDeleteButtonDisable = (status) => {
+    switch (status) {
+        case 'ASSIGNED':
+            return true;
 
-const getAllModelImges = () => {
-    axios.get(constants.CLIENT_ALL_MODEL_IMAGES).then((response) => {
-        if (response.status === 200) {
-            modelImages.value = response.data;
-        }
-    }).catch((error) => {
-        console.error(error);
-    });
+        case 'UNASSIGNED':
+            return false;
+
+        default:
+            return false;
+    }
 }
 
 
@@ -235,25 +268,6 @@ const saveProject = () => {
     });
 };
 
-
-
-
-const openNew = () => {
-    clearCreateProject();
-    project.value = {};
-    submitted.value = false;
-    productDialog.value = true;
-};
-const hideDialog = () => {
-    productDialog.value = false;
-    submitted.value = false;
-};
-
-
-const editProduct = (prod) => {
-    product.value = { ...prod };
-    productDialog.value = true;
-};
 const confirmDeleteProduct = (id) => {
     confirm.require({
         message: 'Are you sure you want to delete project?',
@@ -279,71 +293,12 @@ const confirmDeleteProduct = (id) => {
     });
 };
 
-
-const getSeverity = (status) => {
-    switch (status) {
-        case 'ASSIGNED':
-            return 'success';
-
-        case 'UNASSIGNED':
-            return 'warning';
-
-        default:
-            return null;
-    }
-};
-
-const checkIsEditDeleteButtonDisable = (status) => {
-    switch (status) {
-        case 'ASSIGNED':
-            return true;
-
-        case 'UNASSIGNED':
-            return false;
-
-        default:
-            return false;
-    }
-}
-
-const data = [
-    {
-        id: 1000,
-        name: 'ammu',
-        country: {
-            name: 'Algeria',
-            code: 'dz'
-        },
-        company: 'Benton, John B Jr',
-        date: '2015-09-13',
-        status: 'unqualified',
-        verified: true,
-        activity: 17,
-        representative: {
-            name: 'Ioni Bowcher',
-            image: 'ionibowcher.png'
-        },
-        balance: 70663
-    }
-]
-
-onMounted(() => {
-    customers.value = data;
-    loading.value = false;
-});
-
-
-const changeDataTable = (data) => {
-    dataTable.value = data;
-}
-
 const logout = () => {
     axios.get(constants.CLIENT_LOGOUT).then((response) => {
         if (response.status === 200)
             router.push('/')
     }).catch((error) => { console.error(error) });
 }
-
 
 const payPlan = (id, planAmount) => {
     confirm.require({
@@ -429,6 +384,120 @@ const downloadPlanImage = (id) => {
     });
 };
 
+
+const approvePlan = (id) => {
+    confirm.require({
+        message: 'Are you sure you want to approve?',
+        header: 'Approve plan',
+        icon: 'pi pi-exclamation-triangle',
+        rejectClass: 'p-button-secondary p-button-outlined',
+        rejectLabel: 'Cancel',
+        acceptLabel: 'Approve',
+        accept: () => {
+            axios.post(constants.CLIENT_PLAN_APPROVE, {
+                id: id,
+                approve: true,
+                reason: ''
+            }).then((response) => {
+                if (response.status === 200) {
+                    getAllPlanImages();
+                    toast.add({ severity: 'success', summary: 'Approve plan', detail: 'Approved Success.', life: 3000 });
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+        },
+        reject: () => {
+            toast.add({ severity: 'info', summary: 'Approve plan', detail: 'You have cancelled', life: 3000 });
+        }
+    });
+};
+
+const approveModel = (id) => {
+    confirm.require({
+        message: 'Are you sure you want to approve?',
+        header: 'Approve model',
+        icon: 'pi pi-exclamation-triangle',
+        rejectClass: 'p-button-secondary p-button-outlined',
+        rejectLabel: 'Cancel',
+        acceptLabel: 'Approve',
+        accept: () => {
+            axios.post(constants.CLIENT_MODEL_APPROVE, {
+                id: id,
+                approve: true,
+                reason: ''
+            }).then((response) => {
+                if (response.status === 200) {
+                    getAllModelImges();
+                    toast.add({ severity: 'success', summary: 'Approve model', detail: 'Approved Success.', life: 3000 });
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+        },
+        reject: () => {
+            toast.add({ severity: 'info', summary: 'Approve model', detail: 'You have cancelled', life: 3000 });
+        }
+    });
+};
+
+const rejectPlan = (id) => {
+    confirm.require({
+        message: 'Are you sure you want to reject?',
+        header: 'Danger Zone',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        acceptLabel: 'Reject',
+        rejectClass: 'p-button-secondary p-button-outlined',
+        acceptClass: 'p-button-danger',
+        accept: () => {
+            // axios.delete(constants.CLIENT_DELETE_PROJECT + "/" + id).then((response) => {
+            //     if (response.status === 200) {
+            //         getAllProjects();
+            //         toast.add({ severity: 'success', summary: 'Delete project', detail: 'Project deleted.', life: 3000 });
+            //     }
+            // }).catch((error) => {
+            //     console.error(error);
+            // });
+        },
+        reject: () => {
+            toast.add({ severity: 'info', summary: 'Reject plan', detail: 'You have cancelled', life: 3000 });
+        }
+    });
+};
+
+const planGetSeverity = (status) => {
+    console.log(status);
+    switch (status) {
+        case 'APPROVED':
+            return 'success';
+
+        case 'PENDING':
+            return 'warning';
+
+        case 'REJECTED':
+            return 'danger';
+
+        default:
+            return null;
+    }
+}
+
+const modelGetSeverity = (status) => {
+    switch (status) {
+        case 'APPROVED':
+            return 'success';
+
+        case 'PENDING':
+            return 'warning';
+
+        case 'REJECTED':
+            return 'danger';
+
+        default:
+            return null;
+    }
+}
 
 
 </script>
@@ -523,9 +592,9 @@ const downloadPlanImage = (id) => {
                     </template>
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
-                            <Button icon="pi pi-pencil" outlined rounded class="mr-2"
+                            <!-- <Button icon="pi pi-pencil" outlined rounded class="mr-2"
                                 @click="editProduct(slotProps.data)"
-                                :disabled="checkIsEditDeleteButtonDisable(slotProps.data.status)" />
+                                :disabled="checkIsEditDeleteButtonDisable(slotProps.data.status)" /> -->
                             <Button icon="pi pi-trash" outlined rounded severity="danger"
                                 @click="confirmDeleteProduct(slotProps.data.id)"
                                 :disabled="checkIsEditDeleteButtonDisable(slotProps.data.status)" />
@@ -628,7 +697,7 @@ const downloadPlanImage = (id) => {
                     <Column field="type" header="Type" style="min-width:12rem"></Column>
                     <Column header="Status" style="min-width:12rem">
                         <template #body="slotProps">
-                            <Tag :value="slotProps.data.status" severity="warning" />
+                            <Tag :value="slotProps.data.status" :severity="planGetSeverity(slotProps.data.status)" />
                         </template>
                     </Column>
                     <!-- <Column :exportable="false" header="image" style="min-width:8rem">
@@ -647,6 +716,18 @@ const downloadPlanImage = (id) => {
                             </Dialog>
                         </template>
                     </Column> -->
+                    <Column header="Approve">
+                        <template #body="slotProps">
+                            <Button label="Approve" outlined :disabled="slotProps.data.status != 'PENDING'"
+                                @click="approvePlan(slotProps.data.id)" />
+                        </template>
+                    </Column>
+                    <Column header="Reject">
+                        <template #body="slotProps">
+                            <Button label="Reject" severity="danger" :disabled="slotProps.data.status != 'PENDING'"
+                                outlined @click="rejectPlan(slotProps.data.id)" />
+                        </template>
+                    </Column>
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button icon="pi pi-download" outlined rounded severity="success"
@@ -654,7 +735,7 @@ const downloadPlanImage = (id) => {
                                 :disabled="slotProps.data.status == PENDING" />
                         </template>
                     </Column>
-                    <template #footer> In total there are {{ planImages ? planImages.length : 0 }} jobs.
+                    <template #footer> In total there are {{ planImages ? planImages.length : 0 }} plan images.
                     </template>
                 </DataTable>
             </div>
@@ -669,7 +750,7 @@ const downloadPlanImage = (id) => {
                     <Column field="type" header="Type" style="min-width:12rem"></Column>
                     <Column header="Status" style="min-width:12rem">
                         <template #body="slotProps">
-                            <Tag :value="slotProps.data.status" severity="warning" />
+                            <Tag :value="slotProps.data.status" :severity="modelGetSeverity(slotProps.data.status)" />
                         </template>
                     </Column>
                     <!-- <Column :exportable="false" header="image" style="min-width:8rem">
@@ -688,6 +769,18 @@ const downloadPlanImage = (id) => {
                             </Dialog>
                         </template>
                     </Column> -->
+                    <Column header="Approve">
+                        <template #body="slotProps">
+                            <Button label="Approve" outlined :disabled="slotProps.data.status != 'PENDING'"
+                                @click="approveModel(slotProps.data.id)" />
+                        </template>
+                    </Column>
+                    <Column header="Reject">
+                        <template #body="slotProps">
+                            <Button label="Reject" severity="danger" outlined
+                                :disabled="slotProps.data.status != 'PENDING'" />
+                        </template>
+                    </Column>
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button icon="pi pi-download" outlined rounded severity="success"
@@ -695,7 +788,7 @@ const downloadPlanImage = (id) => {
                                 :disabled="slotProps.data.status == PENDING" />
                         </template>
                     </Column>
-                    <template #footer> In total there are {{ modelImages ? modelImages.length : 0 }} jobs.
+                    <template #footer> In total there are {{ modelImages ? modelImages.length : 0 }} model images.
                     </template>
                 </DataTable>
             </div>

@@ -13,8 +13,6 @@ const confirm = useConfirm();
 const toast = useToast();
 const dataTable = ref('jobs')
 const productDialog = ref(false);
-const deleteProductDialog = ref(false);
-const deleteProductsDialog = ref(false);
 const project = ref({});
 const submitted = ref(false);
 const loggedUserName = ref('')
@@ -24,14 +22,11 @@ const modelImages = ref([]);
 const uploadPlan = ref(false);
 const uploadModel = ref(false)
 const visible = ref(false);
-
-
 const planAmount = ref('100')
 const threeDModelAmount = ref('100')
 const errorPlanAmount = ref(false)
 const errorThreeDModel = ref(false)
 const updateProjectId = ref('');
-
 const planUploadProjectId = ref('');
 const modelUploadProjectId = ref('');
 
@@ -67,18 +62,19 @@ const getAllModelImges = () => {
     });
 }
 
-
-onMounted(() => {
+const getProfile = () => {
     axios.get(constants.ENGINEER_PROFILE).then((res) => {
         loggedUserName.value = res.data.name;
     }).catch((error) => {
         console.error(error)
         router.push('/engineer')
     });
-    getAllJobs();
-    getAllModelImges();
-    getAllPlanImages();
-})
+}
+
+getProfile();
+getAllJobs();
+getAllModelImges();
+getAllPlanImages();
 
 
 const clearUpdateProject = () => {
@@ -152,65 +148,6 @@ const hideDialog = () => {
     submitted.value = false;
 };
 
-
-const editProduct = (prod) => {
-    product.value = { ...prod };
-    productDialog.value = true;
-};
-const confirmDeleteProduct = (id) => {
-    confirm.require({
-        message: 'Are you sure you want to delete project?',
-        header: 'Danger Zone',
-        icon: 'pi pi-info-circle',
-        rejectLabel: 'Cancel',
-        acceptLabel: 'Delete',
-        rejectClass: 'p-button-secondary p-button-outlined',
-        acceptClass: 'p-button-danger',
-        accept: () => {
-            axios.delete(constants.CLIENT_DELETE_PROJECT + "/" + id).then((response) => {
-                if (response.status === 200) {
-                    getAllProjects();
-                    toast.add({ severity: 'success', summary: 'Delete project', detail: 'Project deleted.', life: 3000 });
-                }
-            }).catch((error) => {
-                console.error(error);
-            });
-        },
-        reject: () => {
-            toast.add({ severity: 'info', summary: 'Delete project', detail: 'You have cancelled', life: 3000 });
-        }
-    });
-};
-
-
-const getSeverity = (status) => {
-    switch (status) {
-        case 'ASSIGNED':
-            return 'success';
-
-        case 'UNASSIGNED':
-            return 'warning';
-
-        default:
-            return null;
-    }
-};
-
-const checkIsEditDeleteButtonDisable = (status) => {
-    switch (status) {
-        case 'ASSIGNED':
-            return true;
-
-        case 'UNASSIGNED':
-            return false;
-
-        default:
-            return false;
-    }
-}
-
-
-
 const changeDataTable = (data) => {
     dataTable.value = data;
 }
@@ -270,11 +207,6 @@ const items = ref([
                 label: computed(() => loggedUserName.value),
                 icon: 'pi pi-user'
             },
-            // {
-            //     label: 'Messages',
-            //     icon: 'pi pi-inbox',
-            //     badge: 2
-            // },
             {
                 label: 'Logout',
                 icon: 'pi pi-sign-out',
@@ -553,7 +485,7 @@ const deletePlanImage = (id) => {
                                 :disabled="slotProps.data.status == PENDING" />
                         </template>
                     </Column>
-                    <template #footer> In total there are {{ planImages ? planImages.length : 0 }} jobs.
+                    <template #footer> In total there are {{ planImages ? planImages.length : 0 }} plan images.
                     </template>
                 </DataTable>
             </div>
@@ -595,7 +527,7 @@ const deletePlanImage = (id) => {
                                 :disabled="slotProps.data.status == PENDING" />
                         </template>
                     </Column>
-                    <template #footer> In total there are {{ modelImages ? modelImages.length : 0 }} jobs.
+                    <template #footer> In total there are {{ modelImages ? modelImages.length : 0 }} model images.
                     </template>
                 </DataTable>
             </div>

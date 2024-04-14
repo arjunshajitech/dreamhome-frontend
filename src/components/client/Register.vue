@@ -35,6 +35,7 @@ const clearLoginForm = () => {
 }
 
 const clearRegisterForm = () => {
+    sticky.value = false;
     registerRequest.name = '',
         registerRequest.email = '',
         registerRequest.password = '',

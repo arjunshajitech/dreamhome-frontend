@@ -17,7 +17,7 @@ const adminLoginRequest = {
 }
 
 onMounted(() => {
-    axios.post(constants.ADMIN_LOGOUT).then(() => { }).catch((error) => { console.error(error) });
+    axios.get(constants.ADMIN_LOGOUT).then(() => { }).catch((error) => { console.error(error) });
 })
 
 const validateEmail = (email) => {
@@ -26,8 +26,7 @@ const validateEmail = (email) => {
 }
 
 const adminLogin = () => {
-
-    // validate request
+    
     if (adminLoginRequest.email === null ||
         adminLoginRequest.email === '' ||
         !validateEmail(adminLoginRequest.email)) {
