@@ -491,9 +491,9 @@ const downloadPlanImage = (id) => {
                             </div>
                         </template>
                     </Column>
-                    <Column header="Status" style="min-width:12rem">
+                    <Column header="Update Amount" style="min-width:12rem">
                         <template #body="slotProps">
-                            <Button :disabled="checkUpdateButtonDisable(slotProps)" label="Update details"
+                            <Button :disabled="checkUpdateButtonDisable(slotProps)" label="Update amount"
                                 icon="pi pi-plus" severity="success" class="" @click="openNew(slotProps.data.id)" />
                         </template>
                     </Column>

@@ -19,6 +19,7 @@ const toast = useToast();
 const visible = ref(false);
 const assingSelectedEngineer = ref('')
 const faq = ref([])
+const feedback = ref([])
 
 const getAllClients = () => {
     axios.get(constants.ADMIN_GET_ALL_CLIETNS).then((response) => {
@@ -65,6 +66,16 @@ const getAllFaq = () => {
     axios.get(constants.ADMIN_GET_FAQ).then((response) => {
         if (response.status === 200) {
             faq.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+const getAllFeedback = () => {
+    axios.get(constants.ADMIN_GET_FEEDBACK).then((response) => {
+        if (response.status === 200) {
+            feedback.value = response.data;
         }
     }).catch((error) => {
         console.error(error);
@@ -243,10 +254,14 @@ const items = ref([
             changeDataTable('jobs');
         }
     },
-    // {
-    //     label: 'Feedback',
-    //     icon: 'pi pi-inbox'
-    // },
+    {
+        label: 'Feedback',
+        icon: 'pi pi-inbox',
+        command: () => {
+            getAllFeedback()
+            changeDataTable('feedback');
+        }
+    },
     {
         label: 'FAQ',
         icon: 'pi pi-comments',
@@ -266,6 +281,22 @@ const getSeverity = (status) => {
             return 'warning';
 
         case 'REJECTED':
+            return 'danger';
+
+        default:
+            return null;
+    }
+};
+
+const getRaitingSev = (status) => {
+    switch (status) {
+        case 'GOOD':
+            return 'success';
+
+        case 'AVERAGE':
+            return 'warning';
+
+        case 'BAD':
             return 'danger';
 
         default:
@@ -424,6 +455,23 @@ const getSeverity = (status) => {
                 <Column field="email" header="Email"></Column>
                 <Column field="question" header="Query"></Column>
                 <template #footer> In total there are {{ faq ? faq.length : 0 }} faqs. </template>
+            </DataTable>
+        </div>
+    </div>
+
+    <div class="client-details mt-5" v-else-if="dataTable === 'feedback'">
+        <div class="card">
+            <Toast />
+            <ConfirmDialog></ConfirmDialog>
+            <DataTable :value="feedback" tableStyle="min-width: 50rem" scrollable scrollHeight="600px">
+                <Column field="projectName" header="Project Name"></Column>
+                <Column field="engineerName" header="Engineer Name"></Column>
+                <Column header="Raiting Status">
+                    <template #body="slotProps">
+                        <Tag :value="slotProps.data.raiting" :severity="getRaitingSev(slotProps.data.raiting)" />
+                    </template>
+                </Column>
+                <template #footer> In total there are {{ feedback ? feedback.length : 0 }} feedback. </template>
             </DataTable>
         </div>
     </div>

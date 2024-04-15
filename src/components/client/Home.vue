@@ -39,6 +39,14 @@ const modelReason = ref('')
 const errorModelReason = ref(false);
 const rejectModelPopup = ref(false);
 
+const feedbackContent = ref('')
+const feedbackRaiting = ref('')
+const errorRaiting = ref(false)
+const errorContent = ref(false)
+const feedbackEngineerId = ref('')
+const feedbackClientId = ref('')
+const feedback = ref(false);
+
 
 const items = ref([
     {
@@ -118,6 +126,64 @@ const projectType = ref([
         label: 'RENOVATION', value: 'RENOVATION'
     }
 ])
+
+
+const raiting = ref([
+    {
+        label: 'GOOD', value: 'GOOD'
+    },
+    {
+        label: 'BAD', value: 'BAD'
+    },
+    {
+        label: 'AVERAGE', value: 'AVERAGE'
+    }
+])
+
+
+const openFeedback = (id, engId) => {
+    feedbackClientId.value = id;
+    feedbackEngineerId.value = engId;
+    feedback.value = true;
+    feedbackContent.value = ''
+    feedbackRaiting.value = ''
+}
+
+const closeFeedback = () => {
+    feedbackClientId.value = '';
+    feedbackEngineerId.value = '';
+    feedback.value = false
+}
+
+const validateFeedback = () => {
+    if (feedbackContent.value === '' || feedbackContent.value === null) {
+        errorContent.value = true;
+        return true;
+    } else errorContent.value = false;
+    if (feedbackRaiting.value === '' || feedbackRaiting.value === null) {
+        errorRaiting.value = true;
+        return true;
+    } else errorRaiting.value = false;
+    return false;
+}
+
+const submitFeedback = () => {
+    if (validateFeedback()) return;
+
+    axios.post(constants.CLIENT_POST_FEEDBACK, {
+        content: feedbackContent.value,
+        raiting: feedbackRaiting.value.value,
+        engineerId: feedbackEngineerId.value,
+        projectId: feedbackClientId.value
+    }).then((response) => {
+        if (response.status === 200) {
+            feedback.value = false;
+            toast.add({ severity: 'success', summary: 'Feedback', detail: 'Submitted.', life: 3000 });
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
 
 const getProfile = () => {
     axios.get(constants.CLIENT_PROFILE_URL).then((res) => {
@@ -632,9 +698,9 @@ const modelGetSeverity = (status) => {
                     </template>
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
-                            <!-- <Button icon="pi pi-pencil" outlined rounded class="mr-2"
-                                @click="editProduct(slotProps.data)"
-                                :disabled="checkIsEditDeleteButtonDisable(slotProps.data.status)" /> -->
+                            <Button icon="pi pi-comments" outlined rounded class="mr-2"
+                                @click="openFeedback(slotProps.data.id, slotProps.data.engineerId)"
+                                :disabled="slotProps.data.status != 'ASSIGNED'" />
                             <Button icon="pi pi-trash" outlined rounded severity="danger"
                                 @click="confirmDeleteProduct(slotProps.data.id)"
                                 :disabled="checkIsEditDeleteButtonDisable(slotProps.data.status)" />
@@ -643,6 +709,33 @@ const modelGetSeverity = (status) => {
 
                 </DataTable>
             </div>
+
+            <Dialog v-model:visible="feedback" :style="{ width: '450px' }" header="Feedback" :modal="true"
+                class="p-fluid">
+                <div class="field">
+                    <label for="description">Feedback</label>
+                    <Textarea id="description" :invalid="errorContent" v-model.trim="feedbackContent" required="true"
+                        rows="3" cols="20" />
+                </div>
+                <div class="field">
+                    <label for="inventoryStatus" class="mb-3">Raiting Status</label>
+                    <Dropdown :invalid="errorRaiting" id="inventoryStatus" v-model="feedbackRaiting" :options="raiting"
+                        optionLabel="label" placeholder="Select a raiting status">
+                        <template #value="slotProps">
+                            <div v-if="slotProps.value && slotProps.value.value">
+                                <Tag :value="slotProps.value.value" />
+                            </div>
+                            <span v-else>
+                                {{ slotProps.placeholder }}
+                            </span>
+                        </template>
+                    </Dropdown>
+                </div>
+                <template #footer>
+                    <Button label="Cancel" icon="pi pi-times" text @click="closeFeedback" />
+                    <Button label="Save" icon="pi pi-check" text @click="submitFeedback" />
+                </template>
+            </Dialog>
 
             <Dialog v-model:visible="productDialog" :style="{ width: '450px' }" header="Create Project" :modal="true"
                 class="p-fluid">
@@ -834,8 +927,8 @@ const modelGetSeverity = (status) => {
                             <Button label="Reject" severity="danger" :disabled="slotProps.data.status != 'PENDING'"
                                 outlined @click="rejectModelPoupOpen(slotProps.data.id)" />
 
-                            <Dialog v-model:visible="rejectModelPopup" :style="{ width: '450px' }"
-                                header="Reason" :modal="true" class="p-fluid">
+                            <Dialog v-model:visible="rejectModelPopup" :style="{ width: '450px' }" header="Reason"
+                                :modal="true" class="p-fluid">
                                 <div class="field">
                                     <label for="description">Reason</label>
                                     <Textarea :invalid="errorModelReason" id="description" v-model.trim="modelReason"
