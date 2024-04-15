@@ -13,6 +13,7 @@ const ADMIN_APPROVE_ENGINEER = BASE_URL + '/admin/approve/engineer'
 const ADMIN_GET_JOBS = BASE_URL + '/admin/jobs'
 const ADMIN_APPROVED_ENGINEERS = BASE_URL + '/admin/engineers/approved'
 const ADMIN_ASSIGN_ENGINEER = BASE_URL + '/admin/assign'
+const ADMIN_GET_FAQ = BASE_URL + '/admin/faq'
 
 const CLIENT_REGISTER = BASE_URL + "/client/signup"
 const CLIENT_LOGIN = BASE_URL + "/client/login"
@@ -29,6 +30,7 @@ const CLIENT_DOWNLOAD_PLAN = BASE_URL + '/client/download/plan'
 const CLIENT_DOWNLOAD_MODEL = BASE_URL + '/client/download/model'
 const CLIENT_PLAN_APPROVE = BASE_URL + '/client/plan/approve-reject'
 const CLIENT_MODEL_APPROVE = BASE_URL + '/client/model/approve-reject'
+const CLIENT_POST_FAQ = BASE_URL + '/client/faq'
 
 const ENGINEER_LOGIN = BASE_URL + '/engineer/login'
 const ENGINEER_SIGNUP = BASE_URL + '/engineer/signup'
@@ -48,6 +50,8 @@ const ENGINEER_DOWNLOAD_MODEL = BASE_URL + '/engineer/download/model'
 
 
 export default {
+    CLIENT_POST_FAQ,
+    ADMIN_GET_FAQ,
     ENGINEER_ACTIVE,
     ENGINEER_DOWNLOAD_MODEL,
     ENGINEER_DOWNLOAD_PLAN,

@@ -18,6 +18,7 @@ const confirm = useConfirm();
 const toast = useToast();
 const visible = ref(false);
 const assingSelectedEngineer = ref('')
+const faq = ref([])
 
 const getAllClients = () => {
     axios.get(constants.ADMIN_GET_ALL_CLIETNS).then((response) => {
@@ -54,6 +55,16 @@ const getAllJobs = () => {
     axios.get(constants.ADMIN_GET_JOBS).then((response) => {
         if (response.status === 200) {
             jobs.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+const getAllFaq = () => {
+    axios.get(constants.ADMIN_GET_FAQ).then((response) => {
+        if (response.status === 200) {
+            faq.value = response.data;
         }
     }).catch((error) => {
         console.error(error);
@@ -236,10 +247,14 @@ const items = ref([
     //     label: 'Feedback',
     //     icon: 'pi pi-inbox'
     // },
-    // {
-    //     label: 'FAQ',
-    //     icon: 'pi pi-comments'
-    // }
+    {
+        label: 'FAQ',
+        icon: 'pi pi-comments',
+        command: () => {
+            getAllFaq()
+            changeDataTable('faq');
+        }
+    }
 ]);
 
 const getSeverity = (status) => {
@@ -396,6 +411,19 @@ const getSeverity = (status) => {
                     </template>
                 </Column>
                 <template #footer> In total there are {{ jobs ? jobs.length : 0 }} jobs. </template>
+            </DataTable>
+        </div>
+    </div>
+
+    <div class="client-details mt-5" v-else-if="dataTable === 'faq'">
+        <div class="card">
+            <Toast />
+            <ConfirmDialog></ConfirmDialog>
+            <DataTable :value="faq" tableStyle="min-width: 50rem" scrollable scrollHeight="600px">
+                <Column field="name" header="Name"></Column>
+                <Column field="email" header="Email"></Column>
+                <Column field="question" header="Query"></Column>
+                <template #footer> In total there are {{ faq ? faq.length : 0 }} faqs. </template>
             </DataTable>
         </div>
     </div>
