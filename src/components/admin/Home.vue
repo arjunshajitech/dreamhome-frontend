@@ -323,6 +323,10 @@ const getRaitingSev = (status) => {
                 <Column field="name" header="Name"></Column>
                 <Column field="email" header="Email"></Column>
                 <Column field="phone" header="Phone"></Column>
+                <Column field="address" header="Address"></Column>
+                <Column field="pincode" header="Pincode"></Column>
+                <Column field="district" header="District"></Column>
+                <Column field="state" header="State"></Column>
                 <Column header="Accept">
                     <template #body="slotProps">
                         <Button label="Accept" outlined @click="confirm1(slotProps.data.id)"

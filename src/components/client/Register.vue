@@ -16,13 +16,51 @@ const invalidRegisterName = ref(false);
 const invalidRegisterEmail = ref(false);
 const invalidRegisterPhone = ref(false);
 const invalidRegisterPassword = ref(false);
+const invalidRegisterDistrict = ref(false);
+const invalidRegisterAddress = ref(false);
+const invalidRegisterPincode = ref(false);
+const invalidRegisterState = ref(false);
 
-const registerRequest = {
+const faqname = ref('')
+const faqemail = ref('')
+const faqquestion = ref('')
+const errorFaqName = ref(false);
+const errorFaqEmail = ref(false);
+const errorFaqQuestion = ref(false);
+
+
+const state = ref([
+    {
+        label: 'KERALA', value: 'KERALA'
+    }
+])
+
+const district = ref([
+    { label: 'ALAPPUZHA', value: 'ALAPPUZHA' },
+    { label: 'KOLLAM', value: 'KOLLAM' },
+    { label: 'KOTTAYAM', value: 'KOTTAYAM' },
+    { label: 'IDUKKI', value: 'IDUKKI' },
+    { label: 'ERNAKULAM', value: 'ERNAKULAM' },
+    { label: 'THRISSUR', value: 'THRISSUR' },
+    { label: 'PALAKKAD', value: 'PALAKKAD' },
+    { label: 'MALAPPURAM', value: 'MALAPPURAM' },
+    { label: 'KOZHIKODE', value: 'KOZHIKODE' },
+    { label: 'WAYANAD', value: 'WAYANAD' },
+    { label: 'KANNUR', value: 'KANNUR' },
+    { label: 'KASARAGOD', value: 'KASARAGOD' }
+])
+
+
+const registerRequest = ref({
     name: '',
     email: '',
     password: '',
-    phone: ''
-}
+    phone: '',
+    address: '',
+    pincode: '',
+    state: '',
+    district: ''
+})
 
 const loginRequest = {
     email: '',
@@ -36,15 +74,18 @@ const clearLoginForm = () => {
 
 const clearRegisterForm = () => {
     sticky.value = false;
-    registerRequest.name = '',
-        registerRequest.email = '',
-        registerRequest.password = '',
-        registerRequest.phone = ''
+    registerRequest.value.name = '',
+        registerRequest.value.email = '',
+        registerRequest.value.password = '',
+        registerRequest.value.phone = ''
+    registerRequest.value.state = ''
+    registerRequest.value.district = ''
+    registerRequest.value.address = ''
+    registerRequest.value.pincode = ''
 }
 
 
 const switchForm = (val) => {
-    console.log(val);
     if (val === 'login') {
         login.value = true;
         clearLoginForm();
@@ -60,7 +101,12 @@ const validateEmail = (email) => {
 }
 
 const isValidPhoneNumber = (input) => {
-    var regex = /^\d{10}$/;
+    var regex = /^[789]\d{9}$/;
+    return regex.test(input);
+}
+
+const isValidPincode = (input) => {
+    var regex = /^\d{6}$/;
     return regex.test(input);
 }
 
@@ -83,42 +129,73 @@ const validateClientLoginRequest = () => {
 }
 
 const validateClientRegisterRequest = () => {
-    if (registerRequest.name === null ||
-        registerRequest.name === '') {
+    if (registerRequest.value.name === null ||
+        registerRequest.value.name === '') {
         invalidRegisterName.value = true
         toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid name', life: 3000 });
         return true;
     } else invalidRegisterName.value = false;
 
-    if (registerRequest.email === null ||
-        registerRequest.email === '' ||
-        !validateEmail(registerRequest.email)) {
+    if (registerRequest.value.email === null ||
+        registerRequest.value.email === '' ||
+        !validateEmail(registerRequest.value.email)) {
         invalidRegisterEmail.value = true
         toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid email', life: 3000 });
         return true;
     } else invalidRegisterEmail.value = false;
 
-    if (registerRequest.password === null ||
-        registerRequest.password === '') {
+    if (registerRequest.value.password === null ||
+        registerRequest.value.password === '') {
         invalidRegisterPassword.value = true
         toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid password', life: 3000 });
         return true;
     } else invalidRegisterPassword.value = false;
 
-    if (registerRequest.phone === null ||
-        registerRequest.phone === '' || !isValidPhoneNumber(registerRequest.phone)) {
+    if (registerRequest.value.phone === null ||
+        registerRequest.value.phone === '' || !isValidPhoneNumber(registerRequest.value.phone)) {
         invalidRegisterPhone.value = true
         toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid phone', life: 3000 });
         return true;
     } else invalidRegisterPhone.value = false;
+
+    if (registerRequest.value.address === null ||
+        registerRequest.value.address === '') {
+        invalidRegisterAddress.value = true
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid address', life: 3000 });
+        return true;
+    } else invalidRegisterAddress.value = false;
+
+    if (registerRequest.value.pincode === null ||
+        registerRequest.value.pincode === '' || !isValidPincode(registerRequest.value.pincode)) {
+        invalidRegisterPincode.value = true
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid pincode', life: 3000 });
+        return true;
+    } else invalidRegisterPincode.value = false;
+
+    if (registerRequest.value.state === null ||
+        registerRequest.value.state === '') {
+        invalidRegisterState.value = true
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid state', life: 3000 });
+        return true;
+    } else invalidRegisterState.value = false;
+
+    if (registerRequest.value.district === null ||
+        registerRequest.value.district === '') {
+        invalidRegisterDistrict.value = true
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid district', life: 3000 });
+        return true;
+    } else invalidRegisterDistrict.value = false;
+
+
     return false;
 }
 
 const clientRegister = () => {
 
     if (validateClientRegisterRequest()) return;
-
-    axios.post(constants.CLIENT_REGISTER, registerRequest).then((response) => {
+    registerRequest.value.district = registerRequest.value.district.value
+    registerRequest.value.state = registerRequest.value.state.value
+    axios.post(constants.CLIENT_REGISTER, registerRequest.value).then((response) => {
         if (response.status === 200) {
             login.value = true;
             clearRegisterForm();
@@ -147,6 +224,45 @@ const clientLogin = () => {
     });
 }
 
+const validateForm = () => {
+    if (faqname.value === '' || faqname.value === null) {
+        errorFaqName.value = true;
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid name', life: 3000 });
+        return true;
+    } else errorFaqName.value = false;
+
+    if (faqemail.value === '' || faqemail.value === null || !validateEmail(faqemail.value)) {
+        errorFaqEmail.value = true;
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid email', life: 3000 });
+        return true;
+    } else errorFaqEmail.value = false;
+
+    if (faqquestion.value === '' || faqquestion.value === null) {
+        errorFaqQuestion.value = true;
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid query', life: 3000 });
+        return true;
+    } else errorFaqQuestion.value = false;
+    return false;
+}
+
+const submitFaq = () => {
+    if (validateForm()) return;
+    axios.post(constants.CLIENT_POST_FAQ, {
+        name: faqname.value,
+        email: faqemail.value,
+        question: faqquestion.value
+    }).then((response) => {
+        if (response.status === 200) {
+            faqname.value = ''
+            faqemail.value = ''
+            faqquestion.value = ''
+            toast.add({ severity: 'success', summary: 'FAQ', detail: 'Submitted.', life: 3000 });
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
 </script>
 
 <template>
@@ -158,54 +274,131 @@ const clientLogin = () => {
             </Message>
         </div>
 
-        <div class="login" v-if="login">
-            <Toast position="bottom-right" group="br" />
-            <p class="login-text">Get started with our app</p>
-            <IconField iconPosition="left">
-                <InputIcon class="pi pi-envelope"> </InputIcon>
-                <InputText v-model="loginRequest.email" placeholder="Email" type="email" :invalid="invalidEmial" />
-            </IconField>
-            <IconField iconPosition="left">
-                <InputIcon class="pi pi-key"> </InputIcon>
-                <InputText v-model="loginRequest.password" placeholder="Password" type="password"
-                    :invalid="invalidPassword" />
-            </IconField>
-            <div class="card flex justify-content-center">
-                <Button type="button" label="Let's go" @click="clientLogin()" class="md:w-19rem w-full" />
+        <div class="banner-register">
+            <div class="banner">
             </div>
-            <p class="create-account" @click="switchForm('signup')">Create an account ?</p>
-            <Toast />
+            <div class="register">
+                <div class="login" v-if="login">
+                    <Toast position="bottom-right" group="br" />
+                    <p class="login-text">Get started with our app</p>
+                    <IconField iconPosition="right">
+                        <InputIcon class="pi pi-envelope"> </InputIcon>
+                        <InputText v-model="loginRequest.email" placeholder="Email" type="email"
+                            :invalid="invalidEmial" />
+                    </IconField>
+                    <IconField iconPosition="right">
+                        <InputIcon class="pi pi-key"> </InputIcon>
+                        <InputText v-model="loginRequest.password" placeholder="Password" type="password"
+                            :invalid="invalidPassword" />
+                    </IconField>
+                    <div class="card flex justify-content-center">
+                        <Button type="button" label="Let's go" @click="clientLogin()" class="md:w-19rem w-full" />
+                    </div>
+                    <p class="create-account" @click="switchForm('signup')">Create an account ?</p>
+                    <Toast />
+                </div>
+
+
+                <div class="signup" v-else>
+                    <Toast position="bottom-right" group="br" />
+                    <p class="login-text">Just create an account.</p>
+                    <IconField iconPosition="right">
+                        <InputIcon class="pi pi-address-book"> </InputIcon>
+                        <InputText v-model="registerRequest.name" placeholder="Name" type="text"
+                            :invalid="invalidRegisterName" />
+                    </IconField>
+                    <IconField iconPosition="right">
+                        <InputIcon class="pi pi-envelope"> </InputIcon>
+                        <InputText v-model="registerRequest.email" placeholder="Email" type="text"
+                            :invalid="invalidRegisterEmail" />
+                    </IconField>
+                    <IconField iconPosition="right">
+                        <InputIcon class="pi pi-key"> </InputIcon>
+                        <InputText v-model="registerRequest.password" placeholder="Password" type="password"
+                            :invalid="invalidRegisterPassword" />
+                    </IconField>
+                    <IconField iconPosition="right">
+                        <InputIcon class="pi pi-phone"> </InputIcon>
+                        <InputText v-model="registerRequest.phone" placeholder="Phone" type="text"
+                            :invalid="invalidRegisterPhone" />
+                    </IconField>
+
+                    <IconField iconPosition="right">
+                        <Textarea id="description" :invalid="invalidRegisterAddress" v-model="registerRequest.address"
+                            required="true" rows="3" cols="23" placeholder="Address" />
+                        <InputIcon class="pi pi-book"> </InputIcon>
+                    </IconField>
+
+                    <IconField iconPosition="right">
+                        <InputIcon class="pi pi-map-marker"> </InputIcon>
+                        <InputText v-model="registerRequest.pincode" placeholder="Pincode" type="text"
+                            :invalid="invalidRegisterPincode" />
+                    </IconField>
+
+                    <IconField iconPosition="right">
+                        <Dropdown id="inventoryStatus" :options="state" optionLabel="label" placeholder="Select State"
+                            class="md:w-19rem w-full" v-model="registerRequest.state" :invalid="invalidRegisterState">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value && slotProps.value.value">
+                                    <Tag :value="slotProps.value.value" />
+                                </div>
+                                <span v-else>
+                                    {{ slotProps.placeholder }}
+                                </span>
+                            </template>
+                        </Dropdown>
+                    </IconField>
+
+                    <IconField iconPosition="right">
+                        <Dropdown id="inventoryStatus" :options="district" optionLabel="label"
+                            placeholder="Select District" class="md:w-19rem w-full" v-model="registerRequest.district"
+                            :invalid="invalidRegisterDistrict">
+                            <template #value="slotProps">
+                                <div v-if="slotProps.value && slotProps.value.value">
+                                    <Tag :value="slotProps.value.value" />
+                                </div>
+                                <span v-else>
+                                    {{ slotProps.placeholder }}
+                                </span>
+                            </template>
+                        </Dropdown>
+                    </IconField>
+
+                    <div class="card flex justify-content-center">
+                        <Button type="button" label="Register" @click="clientRegister()" class="md:w-19rem w-full" />
+                    </div>
+                    <p class="create-account" @click="switchForm('login')">Already have an account ?</p>
+                    <Toast />
+                </div>
+            </div>
         </div>
 
 
-        <div class="signup" v-else>
-            <Toast position="bottom-right" group="br" />
-            <p class="login-text">Just create an account.</p>
-            <IconField iconPosition="left">
-                <InputIcon class="pi pi-address-book"> </InputIcon>
-                <InputText v-model="registerRequest.name" placeholder="Name" type="text"
-                    :invalid="invalidRegisterName" />
-            </IconField>
-            <IconField iconPosition="left">
-                <InputIcon class="pi pi-envelope"> </InputIcon>
-                <InputText v-model="registerRequest.email" placeholder="Email" type="text"
-                    :invalid="invalidRegisterEmail" />
-            </IconField>
-            <IconField iconPosition="left">
-                <InputIcon class="pi pi-key"> </InputIcon>
-                <InputText v-model="registerRequest.password" placeholder="Password" type="password"
-                    :invalid="invalidRegisterPassword" />
-            </IconField>
-            <IconField iconPosition="left">
-                <InputIcon class="pi pi-phone"> </InputIcon>
-                <InputText v-model="registerRequest.phone" placeholder="Phone" type="text"
-                    :invalid="invalidRegisterPhone" />
-            </IconField>
-            <div class="card flex justify-content-center">
-                <Button type="button" label="Register" @click="clientRegister()" class="md:w-19rem w-full" />
+        <div class="faq mt-5">
+            <h1>FAQ</h1>
+            <h3>Welcome to the Dream Home FAQ page! Feel free to contact us directly for assistance.</h3>
+
+            <div class="faq-form">
+                <Toast/>
+                <IconField iconPosition="right">
+                    <InputIcon class="pi pi-address-book"> </InputIcon>
+                    <InputText v-model="faqname" placeholder="Name" type="text" :invalid="errorFaqName" />
+                </IconField>
+                <IconField iconPosition="right">
+                    <InputIcon class="pi pi-envelope"> </InputIcon>
+                    <InputText v-model="faqemail" placeholder="Email" type="text" :invalid="errorFaqEmail" />
+                </IconField>
+
+                <IconField iconPosition="right">
+                    <Textarea id="description" :invalid="errorFaqQuestion" v-model="faqquestion" required="true"
+                        rows="3" cols="23" placeholder="Type anything" />
+                    <InputIcon class="pi pi-book"> </InputIcon>
+                </IconField>
+
+                <div class="card flex justify-content-center mb-5">
+                    <Button type="button" label="Submit" @click="submitFaq()" class="md:w-19rem w-full" />
+                </div>
             </div>
-            <p class="create-account" @click="switchForm('login')">Already have an account ?</p>
-            <Toast />
         </div>
     </div>
 </template>

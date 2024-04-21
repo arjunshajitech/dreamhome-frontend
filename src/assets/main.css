@@ -21,6 +21,7 @@
 }
 
 .client-header-container {
+
     .p-menubar-root-list {
         display: flex;
         justify-content: center;
@@ -54,13 +55,18 @@
 .client-login-container {
 
     .login,
-    .signup {
+    .signup,
+    .faq-form {
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-top: 100px;
+        margin-top: 30px;
         flex-direction: column;
         row-gap: 20px;
+    }
+
+    .login {
+        margin-top: 200px;
     }
 }
 
@@ -137,4 +143,34 @@
         margin-left: 5%;
         margin-right: 5%;
     }
+}
+
+.banner-register {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 50px;
+}
+
+.banner {
+    margin-top: 10px;
+    background-image: url('/public/images/dh.jpg');
+    background-size: cover;
+    /* Adjust as needed */
+    background-position: center;
+    width: 60%;
+    height: 90vh;
+}
+
+.register {
+    width: 40%;
+    height: 90vh;
+}
+
+.faq {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
