@@ -518,20 +518,6 @@ const downloadPlanImage = (id) => {
                     <small class="p-error" v-if="errorThreeDModel">3D Model amount must be greater than or equal to
                         100</small>
                 </div>
-                <!-- <div class="field">
-                    <label for="name">Plan estimation (days)</label>
-                    <InputNumber id="name" v-model.trim="planEstimation" required="true" autofocus
-                        :invalid="errorPlanEstimation" />
-                    <small class="p-error" v-if="errorPlanEstimation">Timeline must be greater than or equal to
-                        1.</small>
-                </div>
-                <div class="field">
-                    <label for="name">3D Model estimation</label>
-                    <InputNumber id="name" v-model.trim="projectTimeline" required="true" autofocus
-                        :invalid="errroThreeDMOdelEstimation" />
-                    <small class="p-error" v-if="errorProjectTimeline">Timeline must be greater than or equal to
-                        1.</small>
-                </div> -->
                 <template #footer>
                     <Button label="Cancel" icon="pi pi-times" text @click="hideDialog" />
                     <Button label="Save" icon="pi pi-check" text @click="saveProject" />
@@ -570,21 +556,6 @@ const downloadPlanImage = (id) => {
                         </template>
                     </Column>
                     <Column field="reason" header="Reason" style="min-width:12rem"></Column>
-                    <!-- <Column :exportable="false" header="image" style="min-width:8rem">
-                        <template #body="slotProps">
-                            <Button label="View" @click="viewImage()" outlined/>
-                            <Dialog v-model:visible="viewPlanImage" modal header="Image" :style="{ width: '50rem' }"
-                                :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                                <div class="card flex justify-content-center">
-                                    <Image alt="Image">
-                                        <template #image>
-                                            <img src="https://primefaces.org/cdn/primevue/images/galleria/galleria11.jpg" alt="preview" :style="slotProps.style"/>
-                                        </template>
-                                    </Image>
-                                </div>
-                            </Dialog>
-                        </template>
-                    </Column> -->
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button icon="pi pi-download" outlined rounded severity="success"
@@ -617,22 +588,6 @@ const downloadPlanImage = (id) => {
                         </template>
                     </Column>
                     <Column field="reason" header="Reason" style="min-width:12rem"></Column>
-                    <!-- <Column :exportable="false" header="image" style="min-width:8rem">
-                        <template #body="slotProps">
-                            <Button label="Show Image" @click="visible = true" />
-                            <Dialog v-model:visible="visible" modal header="Image" :style="{ width: '50rem' }"
-                                :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                                <p class="mb-5">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                    exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                    dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                                    sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                </p>
-                            </Dialog>
-                        </template>
-                    </Column> -->
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button icon="pi pi-download" outlined rounded severity="success"

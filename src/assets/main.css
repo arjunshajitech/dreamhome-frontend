@@ -1,3 +1,33 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.engineer-header-container {
+    .p-menubar-root-list {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        height: 50px;
+        column-gap: 100px;
+    }
+
+    .p-menubar {
+        color: var(--primary-color);
+        position: fixed;
+        width: 100%;
+        z-index: 1000;
+        /* color: var(--primary-color-text); */
+    }
+
+    .p-menuitem-link,
+    .p-menuitem-icon,
+    .p-menuitem-text {
+        color: var(--primary-color);
+        font-size: 20px;
+    }
+}
+
 .admin-header-container {
     .p-menubar-root-list {
         display: flex;
@@ -31,6 +61,9 @@
     }
 
     .p-menubar {
+        position: fixed;
+        width: 100%;
+        z-index: 1000;
         color: var(--primary-color);
         /* color: var(--primary-color-text); */
     }
@@ -63,6 +96,10 @@
         margin-top: 30px;
         flex-direction: column;
         row-gap: 20px;
+    }
+
+    .signup {
+        margin-top: 100px;
     }
 
     .login {
@@ -150,11 +187,12 @@
     justify-content: center;
     align-items: center;
     column-gap: 50px;
+    margin-left: 5px;
 }
 
 .banner {
-    margin-top: 10px;
-    background-image: url('/public/images/dh.jpg');
+    margin-top: 70px;
+    background-image: url('/images/dh.jpg');
     background-size: cover;
     /* Adjust as needed */
     background-position: center;
@@ -165,6 +203,10 @@
 .register {
     width: 40%;
     height: 90vh;
+
+    .stick {
+        margin-top: 50px;
+    }
 }
 
 .faq {
@@ -173,4 +215,11 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+
+.input-seperate {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    column-gap: 10px;
 }

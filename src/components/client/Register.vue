@@ -165,13 +165,6 @@ const validateClientRegisterRequest = () => {
         return true;
     } else invalidRegisterAddress.value = false;
 
-    if (registerRequest.value.pincode === null ||
-        registerRequest.value.pincode === '' || !isValidPincode(registerRequest.value.pincode)) {
-        invalidRegisterPincode.value = true
-        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid pincode', life: 3000 });
-        return true;
-    } else invalidRegisterPincode.value = false;
-
     if (registerRequest.value.state === null ||
         registerRequest.value.state === '') {
         invalidRegisterState.value = true
@@ -185,6 +178,13 @@ const validateClientRegisterRequest = () => {
         toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid district', life: 3000 });
         return true;
     } else invalidRegisterDistrict.value = false;
+
+    if (registerRequest.value.pincode === null ||
+        registerRequest.value.pincode === '' || !isValidPincode(registerRequest.value.pincode)) {
+        invalidRegisterPincode.value = true
+        toast.add({ severity: 'warn', summary: 'Warning Message', detail: 'Inavlid pincode', life: 3000 });
+        return true;
+    } else invalidRegisterPincode.value = false;
 
 
     return false;
@@ -268,16 +268,17 @@ const submitFaq = () => {
 <template>
     <div class="client-login-container">
 
-        <div class="card" v-if="sticky">
-            <Message severity="success" :sticky="false" :life="5000">
-                You are successfully registerd. Kindly Please wait for admin approval.
-            </Message>
-        </div>
-
         <div class="banner-register">
             <div class="banner">
             </div>
             <div class="register">
+                <div class="stick">
+                    <div class="card" v-if="sticky">
+                        <Message severity="success" :sticky="false" :life="5000">
+                            You are successfully registerd. Kindly Please wait for admin approval.
+                        </Message>
+                    </div>
+                </div>
                 <div class="login" v-if="login">
                     <Toast position="bottom-right" group="br" />
                     <p class="login-text">Get started with our app</p>
@@ -302,68 +303,73 @@ const submitFaq = () => {
                 <div class="signup" v-else>
                     <Toast position="bottom-right" group="br" />
                     <p class="login-text">Just create an account.</p>
-                    <IconField iconPosition="right">
-                        <InputIcon class="pi pi-address-book"> </InputIcon>
-                        <InputText v-model="registerRequest.name" placeholder="Name" type="text"
-                            :invalid="invalidRegisterName" />
-                    </IconField>
-                    <IconField iconPosition="right">
-                        <InputIcon class="pi pi-envelope"> </InputIcon>
-                        <InputText v-model="registerRequest.email" placeholder="Email" type="text"
-                            :invalid="invalidRegisterEmail" />
-                    </IconField>
-                    <IconField iconPosition="right">
-                        <InputIcon class="pi pi-key"> </InputIcon>
-                        <InputText v-model="registerRequest.password" placeholder="Password" type="password"
-                            :invalid="invalidRegisterPassword" />
-                    </IconField>
-                    <IconField iconPosition="right">
-                        <InputIcon class="pi pi-phone"> </InputIcon>
-                        <InputText v-model="registerRequest.phone" placeholder="Phone" type="text"
-                            :invalid="invalidRegisterPhone" />
-                    </IconField>
 
+                    <div class="input-seperate">
+                        <IconField iconPosition="right">
+                            <InputIcon class="pi pi-address-book"> </InputIcon>
+                            <InputText v-model="registerRequest.name" placeholder="Name" type="text"
+                                :invalid="invalidRegisterName" />
+                        </IconField>
+                        <IconField iconPosition="right">
+                            <InputIcon class="pi pi-envelope"> </InputIcon>
+                            <InputText v-model="registerRequest.email" placeholder="Email" type="text"
+                                :invalid="invalidRegisterEmail" />
+                        </IconField>
+                    </div>
+                    <div class="input-seperate">
+                        <IconField iconPosition="right">
+                            <InputIcon class="pi pi-key"> </InputIcon>
+                            <InputText v-model="registerRequest.password" placeholder="Password" type="password"
+                                :invalid="invalidRegisterPassword" />
+                        </IconField>
+                        <IconField iconPosition="right">
+                            <InputIcon class="pi pi-phone"> </InputIcon>
+                            <InputText v-model="registerRequest.phone" placeholder="Phone" type="text"
+                                :invalid="invalidRegisterPhone" />
+                        </IconField>
+                    </div>
                     <IconField iconPosition="right">
                         <Textarea id="description" :invalid="invalidRegisterAddress" v-model="registerRequest.address"
-                            required="true" rows="3" cols="23" placeholder="Address" />
+                            required="true" rows="3" cols="53" placeholder="Address" />
                         <InputIcon class="pi pi-book"> </InputIcon>
                     </IconField>
+                    <div class="input-seperate">
 
+                        <IconField iconPosition="right">
+                            <Dropdown id="inventoryStatus" :options="state" optionLabel="label"
+                                placeholder="Select State" class="md:w-19rem w-full" v-model="registerRequest.state"
+                                :invalid="invalidRegisterState">
+                                <template #value="slotProps">
+                                    <div v-if="slotProps.value && slotProps.value.value">
+                                        <Tag :value="slotProps.value.value" />
+                                    </div>
+                                    <span v-else>
+                                        {{ slotProps.placeholder }}
+                                    </span>
+                                </template>
+                            </Dropdown>
+                        </IconField>
+
+                        <IconField iconPosition="right">
+                            <Dropdown id="inventoryStatus" :options="district" optionLabel="label"
+                                placeholder="Select District" class="md:w-19rem w-full"
+                                v-model="registerRequest.district" :invalid="invalidRegisterDistrict">
+                                <template #value="slotProps">
+                                    <div v-if="slotProps.value && slotProps.value.value">
+                                        <Tag :value="slotProps.value.value" />
+                                    </div>
+                                    <span v-else>
+                                        {{ slotProps.placeholder }}
+                                    </span>
+                                </template>
+                            </Dropdown>
+                        </IconField>
+                    </div>
                     <IconField iconPosition="right">
                         <InputIcon class="pi pi-map-marker"> </InputIcon>
                         <InputText v-model="registerRequest.pincode" placeholder="Pincode" type="text"
                             :invalid="invalidRegisterPincode" />
                     </IconField>
-
-                    <IconField iconPosition="right">
-                        <Dropdown id="inventoryStatus" :options="state" optionLabel="label" placeholder="Select State"
-                            class="md:w-19rem w-full" v-model="registerRequest.state" :invalid="invalidRegisterState">
-                            <template #value="slotProps">
-                                <div v-if="slotProps.value && slotProps.value.value">
-                                    <Tag :value="slotProps.value.value" />
-                                </div>
-                                <span v-else>
-                                    {{ slotProps.placeholder }}
-                                </span>
-                            </template>
-                        </Dropdown>
-                    </IconField>
-
-                    <IconField iconPosition="right">
-                        <Dropdown id="inventoryStatus" :options="district" optionLabel="label"
-                            placeholder="Select District" class="md:w-19rem w-full" v-model="registerRequest.district"
-                            :invalid="invalidRegisterDistrict">
-                            <template #value="slotProps">
-                                <div v-if="slotProps.value && slotProps.value.value">
-                                    <Tag :value="slotProps.value.value" />
-                                </div>
-                                <span v-else>
-                                    {{ slotProps.placeholder }}
-                                </span>
-                            </template>
-                        </Dropdown>
-                    </IconField>
-
                     <div class="card flex justify-content-center">
                         <Button type="button" label="Register" @click="clientRegister()" class="md:w-19rem w-full" />
                     </div>
@@ -379,7 +385,7 @@ const submitFaq = () => {
             <h3>Welcome to the Dream Home FAQ page! Feel free to contact us directly for assistance.</h3>
 
             <div class="faq-form">
-                <Toast/>
+                <Toast />
                 <IconField iconPosition="right">
                     <InputIcon class="pi pi-address-book"> </InputIcon>
                     <InputText v-model="faqname" placeholder="Name" type="text" :invalid="errorFaqName" />
