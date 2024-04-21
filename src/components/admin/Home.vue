@@ -508,6 +508,7 @@ const downloadReceipt = (id) => {
             <ConfirmDialog></ConfirmDialog>
             <DataTable :value="paymentTransactions" tableStyle="min-width: 50rem" scrollable scrollHeight="600px">
                 <Column field="id" header="PaymentId"></Column>
+                <Column field="projectName" header="Project Name"></Column>
                 <Column field="engineerName" header="Engineer Name"></Column>
                 <Column field="clientName" header="Client Name"></Column>
                 <Column field="amount" header="Amount"></Column>
