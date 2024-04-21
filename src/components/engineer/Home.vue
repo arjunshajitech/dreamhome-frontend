@@ -384,10 +384,10 @@ const modelGetSeverity = (status) => {
     }
 }
 
-const downloadReceipt = (id) => {
-    axios.get(constants.ENGINEER_DOWNLOAD_RECIEPT + "/" + id).then((response) => {
+const downloadReceipt = (id, type) => {
+    axios.get(constants.ENGINEER_DOWNLOAD_RECIEPT + "/" + id + "/" + type).then((response) => {
         if (response.status === 200) {
-            var pdfUrl = constants.BASE_URL + "/engineer/download/pdf/" + id;
+            var pdfUrl = constants.BASE_URL + "/engineer/download/pdf/" + id + "/" + type;
             var link = document.createElement('a');
             link.href = pdfUrl;
             link.download = "payment_reciept.pdf"
@@ -498,7 +498,9 @@ const downloadPlanImage = (id) => {
                     </Column>
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
-                            <Button v-if="slotProps.data.planAmountPaid === true" @click="downloadReceipt(slotProps.data.paymentId)" icon="pi pi-receipt" outlined rounded severity="success" />
+                            <Button v-if="slotProps.data.planAmountPaid === true"
+                                @click="downloadReceipt(slotProps.data.id, 'PLAN')" icon="pi pi-receipt"
+                                outlined rounded severity="success" />
                         </template>
                     </Column>
                     <Column header="3D model payment" style="min-width:12rem">
@@ -514,7 +516,9 @@ const downloadPlanImage = (id) => {
                     </Column>
                     <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
-                            <Button v-if="slotProps.data.threeDModelAmountPaid === true" @click="downloadReceipt(slotProps.data.paymentId)" icon="pi pi-receipt" outlined rounded severity="success" />
+                            <Button v-if="slotProps.data.threeDModelAmountPaid === true"
+                                @click="downloadReceipt(slotProps.data.id,'3D MODEL')" icon="pi pi-receipt"
+                                outlined rounded severity="success" />
                         </template>
                     </Column>
                     <Column header="Update Amount" style="min-width:12rem">

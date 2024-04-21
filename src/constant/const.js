@@ -35,6 +35,7 @@ const CLIENT_PLAN_APPROVE = BASE_URL + '/client/plan/approve-reject'
 const CLIENT_MODEL_APPROVE = BASE_URL + '/client/model/approve-reject'
 const CLIENT_POST_FAQ = BASE_URL + '/client/faq'
 const CLIENT_POST_FEEDBACK = BASE_URL + '/client/feedback'
+const CLIENT_DOWNLOAD_RECIEPT = BASE_URL + '/client/download/pdf'
 
 const ENGINEER_LOGIN = BASE_URL + '/engineer/login'
 const ENGINEER_SIGNUP = BASE_URL + '/engineer/signup'
@@ -55,6 +56,7 @@ const ENGINEER_DOWNLOAD_RECIEPT = BASE_URL + '/engineer/download/pdf'
 
 
 export default {
+    CLIENT_DOWNLOAD_RECIEPT,
     ENGINEER_DOWNLOAD_RECIEPT,
     ADMIN_DOWNLOAD_RECIEPT,
     ADMIN_GET_ALL_PAYMENT,

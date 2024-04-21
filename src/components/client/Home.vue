@@ -740,6 +740,21 @@ const modelGetSeverity = (status) => {
     }
 }
 
+const downloadReceipt = (id, type) => {
+    axios.get(constants.CLIENT_DOWNLOAD_RECIEPT + "/" + id + "/" + type).then((response) => {
+        if (response.status === 200) {
+            var pdfUrl = constants.BASE_URL + "/client/download/pdf/" + id + "/" + type;
+            var link = document.createElement('a');
+            link.href = pdfUrl;
+            link.download = "payment_reciept.pdf"
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
 
 </script>
 
@@ -809,6 +824,13 @@ const modelGetSeverity = (status) => {
                             </div>
                         </template>
                     </Column>
+                    <Column :exportable="false" style="">
+                        <template #body="slotProps">
+                            <Button v-if="slotProps.data.planAmountPaid === true"
+                                @click="downloadReceipt(slotProps.data.id,'PLAN')" icon="pi pi-receipt"
+                                outlined rounded severity="success" />
+                        </template>
+                    </Column>
                     <Column header="3D model payment" style="min-width:12rem">
                         <template #body="slotProps">
                             <div v-if="slotProps.data.threeDModelAmountPaid === true">
@@ -825,6 +847,13 @@ const modelGetSeverity = (status) => {
                             <div v-else>
                                 <Tag value="PAYMENT PENDING" severity="warning" />
                             </div>
+                        </template>
+                    </Column>
+                    <Column :exportable="false" style="">
+                        <template #body="slotProps">
+                            <Button v-if="slotProps.data.threeDModelAmountPaid === true"
+                                @click="downloadReceipt(slotProps.data.id,'3D MODEL')" icon="pi pi-receipt"
+                                outlined rounded severity="success" />
                         </template>
                     </Column>
                     <Column header="Status" style="min-width:12rem">
