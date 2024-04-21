@@ -20,6 +20,7 @@ const visible = ref(false);
 const assingSelectedEngineer = ref('')
 const faq = ref([])
 const feedback = ref([])
+const paymentTransactions = ref([])
 
 const getAllClients = () => {
     axios.get(constants.ADMIN_GET_ALL_CLIETNS).then((response) => {
@@ -31,6 +32,16 @@ const getAllClients = () => {
     });
 }
 getAllClients();
+
+const getAllPaymentTransactions = () => {
+    axios.get(constants.ADMIN_GET_ALL_PAYMENT).then((response) => {
+        if (response.status === 200) {
+            paymentTransactions.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
 
 const getAllEngineers = () => {
     axios.get(constants.ADMIN_GET_ALL_ENGINEERS).then((response) => {
@@ -269,6 +280,14 @@ const items = ref([
             getAllFaq()
             changeDataTable('faq');
         }
+    },
+    {
+        label: 'Payment Transactions',
+        icon: 'pi pi-receipt',
+        command: () => {
+            getAllPaymentTransactions()
+            changeDataTable('payment');
+        }
     }
 ]);
 
@@ -303,6 +322,22 @@ const getRaitingSev = (status) => {
             return null;
     }
 };
+
+const downloadReceipt = (id) => {
+    axios.get(constants.ADMIN_DOWNLOAD_RECIEPT + "/" + id).then((response) => {
+        if (response.status === 200) {
+            var pdfUrl = constants.BASE_URL + "/admin/download/pdf/" + id;
+            var link = document.createElement('a');
+            link.href = pdfUrl;
+            link.download = "payment_reciept.pdf"
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
 
 
 
@@ -357,6 +392,10 @@ const getRaitingSev = (status) => {
                 <Column field="name" header="Name"></Column>
                 <Column field="email" header="Email"></Column>
                 <Column field="phone" header="Phone"></Column>
+                <Column field="address" header="Address"></Column>
+                <Column field="pincode" header="Pincode"></Column>
+                <Column field="district" header="District"></Column>
+                <Column field="state" header="State"></Column>
                 <Column field="jobTitle" header="Job Title"></Column>
                 <Column field="yearOfExperience" header="Year of experience" style="min-width:12rem">
                     <template #body="slotProps">
@@ -380,7 +419,7 @@ const getRaitingSev = (status) => {
                         <Tag :value="slotProps.data.status" :severity="getSeverity(slotProps.data.status)" />
                     </template>
                 </Column>
-                <template #footer> In total there are {{ engineers ? engineers.length : 0 }} eningneers. </template>
+                <template #footer> In total there are {{ engineers ? engineers.length : 0 }} engineers. </template>
             </DataTable>
         </div>
     </div>
@@ -459,6 +498,30 @@ const getRaitingSev = (status) => {
                 <Column field="email" header="Email"></Column>
                 <Column field="question" header="Query"></Column>
                 <template #footer> In total there are {{ faq ? faq.length : 0 }} faqs. </template>
+            </DataTable>
+        </div>
+    </div>
+
+    <div class="client-details mt-5" v-else-if="dataTable === 'payment'">
+        <div class="card">
+            <Toast />
+            <ConfirmDialog></ConfirmDialog>
+            <DataTable :value="paymentTransactions" tableStyle="min-width: 50rem" scrollable scrollHeight="600px">
+                <Column field="id" header="PaymentId"></Column>
+                <Column field="engineerName" header="Engineer Name"></Column>
+                <Column field="clientName" header="Client Name"></Column>
+                <Column field="amount" header="Amount"></Column>
+                <Column field="paymentMethod" header="Payment Method"></Column>
+                <Column field="cardNumber" header="Card Number"></Column>
+                <Column field="localDateTime" header="Date and Time"></Column>
+                <Column field="type" header="Type "></Column>
+                <Column :exportable="false" style="min-width:8rem">
+                    <template #body="slotProps">
+                        <Button @click="downloadReceipt(slotProps.data.id)" icon="pi pi-receipt" outlined rounded severity="success" />
+                    </template>
+                </Column>
+                <template #footer> In total there are {{ paymentTransactions ? paymentTransactions.length : 0 }} payment
+                    transactions. </template>
             </DataTable>
         </div>
     </div>

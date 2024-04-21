@@ -15,6 +15,8 @@ const ADMIN_APPROVED_ENGINEERS = BASE_URL + '/admin/engineers/approved'
 const ADMIN_ASSIGN_ENGINEER = BASE_URL + '/admin/assign'
 const ADMIN_GET_FAQ = BASE_URL + '/admin/faq'
 const ADMIN_GET_FEEDBACK = BASE_URL + '/admin/feedback'
+const ADMIN_GET_ALL_PAYMENT = BASE_URL + '/admin/payment-history'
+const ADMIN_DOWNLOAD_RECIEPT = BASE_URL + '/admin/download/pdf'
 
 const CLIENT_REGISTER = BASE_URL + "/client/signup"
 const CLIENT_LOGIN = BASE_URL + "/client/login"
@@ -49,9 +51,13 @@ const ENGINEER_DELETE_PLAN_IMAGE = BASE_URL + '/engineer/plan'
 const ENGINEER_DELETE_MODEL_IMAGE = BASE_URL + '/engineer/model'
 const ENGINEER_DOWNLOAD_PLAN = BASE_URL + '/engineer/download/plan'
 const ENGINEER_DOWNLOAD_MODEL = BASE_URL + '/engineer/download/model'
+const ENGINEER_DOWNLOAD_RECIEPT = BASE_URL + '/engineer/download/pdf'
 
 
 export default {
+    ENGINEER_DOWNLOAD_RECIEPT,
+    ADMIN_DOWNLOAD_RECIEPT,
+    ADMIN_GET_ALL_PAYMENT,
     CLIENT_POST_FEEDBACK,
     ADMIN_GET_FEEDBACK,
     CLIENT_POST_FAQ,

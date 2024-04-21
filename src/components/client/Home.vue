@@ -47,6 +47,21 @@ const feedbackEngineerId = ref('')
 const feedbackClientId = ref('')
 const feedback = ref(false);
 
+const modelPaymentDilog = ref(false);
+const planPaymentDilog = ref(false);
+const modelPaymentMethod = ref('')
+const planPaymentMethod = ref('')
+const modelPaymentCardNumber = ref('')
+const planPaymentCardNumber = ref('')
+const errorModelPaymentMethod = ref(false);
+const errorPlanPaymentMethod = ref(false);
+const errorModelCardNumber = ref(false);
+const errorPlanCardNumber = ref(false);
+const modelPaymentProjectId = ref('')
+const modelPaymentAmount = ref('')
+const planPyamentProjectId = ref('')
+const planPyamentAmount = ref('')
+
 
 const items = ref([
     {
@@ -105,6 +120,14 @@ const items = ref([
     }
 ]);
 
+const paymentMethod = ref([
+    {
+        label: 'CREDIT CARD', value: 'CREDIT_CARD'
+    },
+    {
+        label: 'DEBIT CARD', value: 'DEBIT_CARD'
+    }
+])
 
 const projectStyle = ref([
     {
@@ -374,51 +397,57 @@ const logout = () => {
 }
 
 const payPlan = (id, planAmount) => {
-    confirm.require({
-        message: 'Are you sure you want to pay?',
-        header: 'Dummy Plan Payment',
-        icon: 'pi pi-exclamation-triangle',
-        rejectClass: 'p-button-secondary p-button-outlined',
-        rejectLabel: 'Cancel',
-        acceptLabel: 'Pay ₹' + planAmount,
-        accept: () => {
-            axios.post(constants.CLIENT_PAY_PLAN + "/" + id).then((response) => {
-                if (response.status === 200) {
-                    getAllProjects();
-                    toast.add({ severity: 'success', summary: 'Dummy Payment', detail: 'Payment success.', life: 3000 });
-                }
-            }).catch((error) => {
-                console.error(error);
-            });
-        },
-        reject: () => {
-            toast.add({ severity: 'info', summary: 'Dummy payment', detail: 'You have cancelled', life: 3000 });
-        }
-    });
+    planPaymentDilog.value = true;
+    planPyamentAmount.value = planAmount;
+    planPyamentProjectId.value = id;
+    // confirm.require({
+    //     message: 'Are you sure you want to pay?',
+    //     header: 'Dummy Plan Payment',
+    //     icon: 'pi pi-exclamation-triangle',
+    //     rejectClass: 'p-button-secondary p-button-outlined',
+    //     rejectLabel: 'Cancel',
+    //     acceptLabel: 'Pay ₹' + planAmount,
+    //     accept: () => {
+    //         axios.post(constants.CLIENT_PAY_PLAN + "/" + id).then((response) => {
+    //             if (response.status === 200) {
+    //                 getAllProjects();
+    //                 toast.add({ severity: 'success', summary: 'Dummy Payment', detail: 'Payment success.', life: 3000 });
+    //             }
+    //         }).catch((error) => {
+    //             console.error(error);
+    //         });
+    //     },
+    //     reject: () => {
+    //         toast.add({ severity: 'info', summary: 'Dummy payment', detail: 'You have cancelled', life: 3000 });
+    //     }
+    // });
 };
 
 const modelPayment = (id, modelAmount) => {
-    confirm.require({
-        message: 'Are you sure you want to pay?',
-        header: 'Dummy 3D Model Payment',
-        icon: 'pi pi-exclamation-triangle',
-        rejectClass: 'p-button-secondary p-button-outlined',
-        rejectLabel: 'Cancel',
-        acceptLabel: 'Pay ₹' + modelAmount,
-        accept: () => {
-            axios.post(constants.CLIENT_PAY_MODEL + "/" + id).then((response) => {
-                if (response.status === 200) {
-                    getAllProjects();
-                    toast.add({ severity: 'success', summary: 'Dummy Payment', detail: 'Payment success.', life: 3000 });
-                }
-            }).catch((error) => {
-                console.error(error);
-            });
-        },
-        reject: () => {
-            toast.add({ severity: 'info', summary: 'Dummy payment', detail: 'You have cancelled', life: 3000 });
-        }
-    });
+    modelPaymentDilog.value = true;
+    modelPaymentAmount.value = modelAmount;
+    modelPaymentProjectId.value = id;
+    // confirm.require({
+    //     message: 'Are you sure you want to pay?',
+    //     header: 'Dummy 3D Model Payment',
+    //     icon: 'pi pi-exclamation-triangle',
+    //     rejectClass: 'p-button-secondary p-button-outlined',
+    //     rejectLabel: 'Cancel',
+    //     acceptLabel: 'Pay ₹' + modelAmount,
+    //     accept: () => {
+    //         axios.post(constants.CLIENT_PAY_MODEL + "/" + id).then((response) => {
+    //             if (response.status === 200) {
+    //                 getAllProjects();
+    //                 toast.add({ severity: 'success', summary: 'Dummy Payment', detail: 'Payment success.', life: 3000 });
+    //             }
+    //         }).catch((error) => {
+    //             console.error(error);
+    //         });
+    //     },
+    //     reject: () => {
+    //         toast.add({ severity: 'info', summary: 'Dummy payment', detail: 'You have cancelled', life: 3000 });
+    //     }
+    // });
 };
 
 const downloadModelImage = (id) => {
@@ -513,6 +542,112 @@ const approveModel = (id) => {
         }
     });
 };
+
+const closePlanPayment = () => {
+    planPaymentDilog.value = false;
+    planPyamentAmount.value = ''
+    planPaymentCardNumber.value = ''
+    planPyamentProjectId.value = ''
+    planPaymentMethod.value = ''
+    errorPlanCardNumber.value = false
+    errorPlanPaymentMethod.value = false;
+}
+
+const closeModelPayment = () => {
+    modelPaymentDilog.value = false;
+    modelPaymentAmount.value = ''
+    modelPaymentCardNumber.value = ''
+    modelPaymentProjectId.value = ''
+    modelPaymentMethod.value = ''
+    errorModelCardNumber.value = false
+    errorModelPaymentMethod.value = false;
+}
+
+const validateNumber = (value) => {
+    return (!isNaN(value) && value >= 0)
+}
+
+const isValidCardNumber = (input) => {
+    var regex = /^\d{12}$/;
+    return regex.test(input);
+}
+
+const validateModelPayment = () => {
+    if (modelPaymentMethod.value === null || modelPaymentMethod.value === '') {
+        errorModelPaymentMethod.value = true;
+        return true;
+    } else errorModelPaymentMethod.value = false;
+
+    if (modelPaymentCardNumber.value === null || modelPaymentCardNumber.value === '' ||
+        !isValidCardNumber(modelPaymentCardNumber.value) ||
+        !validateNumber(modelPaymentCardNumber.value)) {
+        errorModelCardNumber.value = true;
+        return true;
+    } else errorModelCardNumber.value = false;
+
+    return false;
+}
+
+const validatePlanPayment = () => {
+    if (planPaymentMethod.value === null || planPaymentMethod.value === '') {
+        errorPlanPaymentMethod.value = true;
+        return true;
+    } else errorModelPaymentMethod.value = false;
+
+    if (planPaymentCardNumber.value === null || planPaymentCardNumber.value === '' ||
+        !isValidCardNumber(planPaymentCardNumber.value) ||
+        !validateNumber(planPaymentCardNumber.value)) {
+        errorPlanCardNumber.value = true;
+        return true;
+    } else errorPlanCardNumber.value = false;
+
+    return false;
+}
+
+const submitPlanPayment = () => {
+
+    if (validatePlanPayment()) return;
+
+    const url = constants.CLIENT_PAY_PLAN + "/" + planPyamentProjectId.value + `?method=${planPaymentMethod.value.value}&cardNumber=${planPaymentCardNumber.value}`
+    axios.post(url).then((response) => {
+        if (response.status === 200) {
+            planPaymentDilog.value = false;
+            planPyamentAmount.value = ''
+            planPaymentCardNumber.value = ''
+            planPyamentProjectId.value = ''
+            planPaymentMethod.value = ''
+            errorPlanCardNumber.value = false
+            errorPlanPaymentMethod.value = false;
+            getAllProjects();
+            toast.add({ severity: 'success', summary: 'Plan Payment', detail: 'Payment success.', life: 3000 });
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+const submitModelPayment = () => {
+
+
+    if (validateModelPayment()) return;
+
+    const url = constants.CLIENT_PAY_MODEL + "/" + modelPaymentProjectId.value + `?method=${modelPaymentMethod.value.value}&cardNumber=${modelPaymentCardNumber.value}`
+    axios.post(url).then((response) => {
+        if (response.status === 200) {
+            modelPaymentDilog.value = false;
+            modelPaymentAmount.value = ''
+            modelPaymentCardNumber.value = ''
+            modelPaymentProjectId.value = ''
+            modelPaymentMethod.value = ''
+            errorModelCardNumber.value = false
+            errorModelPaymentMethod.value = false;
+            getAllProjects();
+            toast.add({ severity: 'success', summary: 'Model Payment', detail: 'Payment success.', life: 3000 });
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
 
 const rejectPlanPoupOpen = (id) => {
     rejectPlanPopup.value = true;
@@ -680,6 +815,9 @@ const modelGetSeverity = (status) => {
                                 <Tag value="PAYMENT SUCCESS" severity="success" />
                             </div>
                             <div v-else-if="slotProps.data.threeDModelAmount != 0">
+                                <!-- <Button label="Pay" severity="success" :disabled="false"
+                                    @click="modelPayment(slotProps.data.id, slotProps.data.threeDModelAmount)"
+                                    outlined /> -->
                                 <Button label="Pay" severity="success" :disabled="false"
                                     @click="modelPayment(slotProps.data.id, slotProps.data.threeDModelAmount)"
                                     outlined />
@@ -734,6 +872,66 @@ const modelGetSeverity = (status) => {
                 <template #footer>
                     <Button label="Cancel" icon="pi pi-times" text @click="closeFeedback" />
                     <Button label="Save" icon="pi pi-check" text @click="submitFeedback" />
+                </template>
+            </Dialog>
+
+            <Dialog v-model:visible="modelPaymentDilog" :style="{ width: '450px' }" header="3D Mode Payment"
+                :modal="true" class="p-fluid">
+                <div class="field">
+                    <label for="name">Amount</label>
+                    <InputNumber id="name" v-model.trim="modelPaymentAmount" disabled="true" />
+                </div>
+                <div class="field">
+                    <label for="inventoryStatus" class="mb-3">Payment Method</label>
+                    <Dropdown :invalid="errorModelPaymentMethod" id="inventoryStatus" v-model="modelPaymentMethod"
+                        :options="paymentMethod" optionLabel="label" placeholder="Select Payment Method">
+                        <template #value="slotProps">
+                            <div v-if="slotProps.value && slotProps.value.value">
+                                <Tag :value="slotProps.value.value" />
+                            </div>
+                            <span v-else>
+                                {{ slotProps.placeholder }}
+                            </span>
+                        </template>
+                    </Dropdown>
+                </div>
+                <div class="field">
+                    <label for="name">Card Number</label>
+                    <InputText id="name" :invalid="errorModelCardNumber" v-model.trim="modelPaymentCardNumber" />
+                </div>
+                <template #footer>
+                    <Button label="Cancel" icon="pi pi-times" text @click="closeModelPayment" />
+                    <Button label="Pay" icon="pi pi-check" text @click="submitModelPayment" />
+                </template>
+            </Dialog>
+
+            <Dialog v-model:visible="planPaymentDilog" :style="{ width: '450px' }" header="Plan Payment"
+                :modal="true" class="p-fluid">
+                <div class="field">
+                    <label for="name">Amount</label>
+                    <InputNumber id="name" v-model.trim="planPyamentAmount" disabled="true" />
+                </div>
+                <div class="field">
+                    <label for="inventoryStatus" class="mb-3">Payment Method</label>
+                    <Dropdown :invalid="errorPlanPaymentMethod" id="inventoryStatus" v-model="planPaymentMethod"
+                        :options="paymentMethod" optionLabel="label" placeholder="Select Payment Method">
+                        <template #value="slotProps">
+                            <div v-if="slotProps.value && slotProps.value.value">
+                                <Tag :value="slotProps.value.value" />
+                            </div>
+                            <span v-else>
+                                {{ slotProps.placeholder }}
+                            </span>
+                        </template>
+                    </Dropdown>
+                </div>
+                <div class="field">
+                    <label for="name">Card Number</label>
+                    <InputText id="name" :invalid="errorPlanCardNumber" v-model.trim="planPaymentCardNumber" />
+                </div>
+                <template #footer>
+                    <Button label="Cancel" icon="pi pi-times" text @click="closePlanPayment" />
+                    <Button label="Pay" icon="pi pi-check" text @click="submitPlanPayment" />
                 </template>
             </Dialog>
 
@@ -797,18 +995,6 @@ const modelGetSeverity = (status) => {
                 </template>
             </Dialog>
 
-            <!-- <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm"
-                    :modal="true">
-                    <div class="confirmation-content">
-                        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="product">Are you sure you want to delete <b>{{ product.name }}</b>?</span>
-                    </div>
-                    <template #footer>
-                        <Button label="No" icon="pi pi-times" text @click="deleteProductDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" text @click="deleteProduct" />
-                    </template>
-                </Dialog> -->
-
             <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                 <div class="confirmation-content">
                     <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
@@ -833,22 +1019,6 @@ const modelGetSeverity = (status) => {
                             <Tag :value="slotProps.data.status" :severity="planGetSeverity(slotProps.data.status)" />
                         </template>
                     </Column>
-                    <!-- <Column :exportable="false" header="image" style="min-width:8rem">
-                        <template #body="slotProps">
-                            <Button label="Show Image" @click="visible = true" />
-                            <Dialog v-model:visible="visible" modal header="Image" :style="{ width: '50rem' }"
-                                :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                                <p class="mb-5">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                    exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                    dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                                    sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                </p>
-                            </Dialog>
-                        </template>
-                    </Column> -->
                     <Column header="Approve">
                         <template #body="slotProps">
                             <Button label="Approve" outlined :disabled="slotProps.data.status != 'PENDING'"
@@ -900,22 +1070,6 @@ const modelGetSeverity = (status) => {
                             <Tag :value="slotProps.data.status" :severity="modelGetSeverity(slotProps.data.status)" />
                         </template>
                     </Column>
-                    <!-- <Column :exportable="false" header="image" style="min-width:8rem">
-                        <template #body="slotProps">
-                            <Button label="Show Image" @click="visible = true" />
-                            <Dialog v-model:visible="visible" modal header="Image" :style="{ width: '50rem' }"
-                                :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                                <p class="mb-5">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                    exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                                    dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                                    sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                </p>
-                            </Dialog>
-                        </template>
-                    </Column> -->
                     <Column header="Approve">
                         <template #body="slotProps">
                             <Button label="Approve" outlined :disabled="slotProps.data.status != 'PENDING'"

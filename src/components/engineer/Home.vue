@@ -384,6 +384,22 @@ const modelGetSeverity = (status) => {
     }
 }
 
+const downloadReceipt = (id) => {
+    axios.get(constants.ENGINEER_DOWNLOAD_RECIEPT + "/" + id).then((response) => {
+        if (response.status === 200) {
+            var pdfUrl = constants.BASE_URL + "/engineer/download/pdf/" + id;
+            var link = document.createElement('a');
+            link.href = pdfUrl;
+            link.download = "payment_reciept.pdf"
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
 const viewImage = () => {
     viewPlanImage.value = true
 }
@@ -480,6 +496,11 @@ const downloadPlanImage = (id) => {
                             </div>
                         </template>
                     </Column>
+                    <Column :exportable="false" style="min-width:8rem">
+                        <template #body="slotProps">
+                            <Button v-if="slotProps.data.planAmountPaid === true" @click="downloadReceipt(slotProps.data.paymentId)" icon="pi pi-receipt" outlined rounded severity="success" />
+                        </template>
+                    </Column>
                     <Column header="3D model payment" style="min-width:12rem">
                         <template #body="slotProps">
                             <div v-if="slotProps.data.threeDModelAmountPaid === true">
@@ -489,6 +510,11 @@ const downloadPlanImage = (id) => {
                             <div v-else>
                                 <Tag value="PAYMENT PENDING" severity="warning" />
                             </div>
+                        </template>
+                    </Column>
+                    <Column :exportable="false" style="min-width:8rem">
+                        <template #body="slotProps">
+                            <Button v-if="slotProps.data.threeDModelAmountPaid === true" @click="downloadReceipt(slotProps.data.paymentId)" icon="pi pi-receipt" outlined rounded severity="success" />
                         </template>
                     </Column>
                     <Column header="Update Amount" style="min-width:12rem">
