@@ -513,7 +513,7 @@ const downloadReceipt = (id) => {
                 <Column field="clientName" header="Client Name"></Column>
                 <Column field="amount" header="Amount"></Column>
                 <Column field="paymentMethod" header="Payment Method"></Column>
-                <Column field="cardNumber" header="Card Number"></Column>
+                <!-- <Column field="cardNumber" header="Card Number"></Column> -->
                 <Column field="localDateTime" header="Date and Time"></Column>
                 <Column field="type" header="Type "></Column>
                 <Column :exportable="false" style="min-width:8rem">

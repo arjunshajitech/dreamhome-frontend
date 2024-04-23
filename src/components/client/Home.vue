@@ -62,6 +62,10 @@ const modelPaymentAmount = ref('')
 const planPyamentProjectId = ref('')
 const planPyamentAmount = ref('')
 
+const RAZORPAY_ID = "rzp_test_7l9OcqB3d2yZOn"
+const RAZORPAY_BASE_URL = "https://api.razorpay.com/v1"
+const orderId = ref('')
+
 
 const items = ref([
     {
@@ -396,58 +400,162 @@ const logout = () => {
     }).catch((error) => { console.error(error) });
 }
 
-const payPlan = (id, planAmount) => {
-    planPaymentDilog.value = true;
-    planPyamentAmount.value = planAmount;
-    planPyamentProjectId.value = id;
-    // confirm.require({
-    //     message: 'Are you sure you want to pay?',
-    //     header: 'Dummy Plan Payment',
-    //     icon: 'pi pi-exclamation-triangle',
-    //     rejectClass: 'p-button-secondary p-button-outlined',
-    //     rejectLabel: 'Cancel',
-    //     acceptLabel: 'Pay ₹' + planAmount,
-    //     accept: () => {
-    //         axios.post(constants.CLIENT_PAY_PLAN + "/" + id).then((response) => {
-    //             if (response.status === 200) {
-    //                 getAllProjects();
-    //                 toast.add({ severity: 'success', summary: 'Dummy Payment', detail: 'Payment success.', life: 3000 });
-    //             }
-    //         }).catch((error) => {
-    //             console.error(error);
-    //         });
-    //     },
-    //     reject: () => {
-    //         toast.add({ severity: 'info', summary: 'Dummy payment', detail: 'You have cancelled', life: 3000 });
-    //     }
-    // });
+const planOptions = {
+    "key": RAZORPAY_ID,
+    "amount": 0,
+    "currency": "INR",
+    "name": "Dream Home",
+    "description": "Test Transaction",
+    "image": "https://example.com/your_logo",
+    "order_id": orderId.value,
+    "handler": function (response) {
+        successPlanPayment()
+        // alert(response.razorpay_payment_id);
+        // alert(response.razorpay_order_id);
+        // alert(response.razorpay_signature)
+    },
+    "prefill": {
+        "name": "Test Test",
+        "email": "test@example.com",
+        "contact": "9000090000"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
 };
 
+const modelOptions = {
+    "key": RAZORPAY_ID,
+    "amount": 0,
+    "currency": "INR",
+    "name": "Dream Home",
+    "description": "Test Transaction",
+    "image": "https://example.com/your_logo",
+    "order_id": orderId.value,
+    "handler": function (response) {
+        successModelPayment()
+        // alert(response.razorpay_payment_id);
+        // alert(response.razorpay_order_id);
+        // alert(response.razorpay_signature)
+    },
+    "prefill": {
+        "name": "Test Test",
+        "email": "test@example.com",
+        "contact": "9000090000"
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+
+const loadRazorpayAndOpenCheckout = () => {
+    if (window.Razorpay) {
+        openRazorpayCheckout();
+    } else {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => {
+            openRazorpayCheckout();
+        };
+        document.body.appendChild(script);
+    }
+};
+
+const openRazorpayCheckout = () => {
+    var rzp = new Razorpay(planOptions);
+    rzp.open();
+    rzp.on('payment.failed', function (response) {
+        alert('Payment Failed.')
+    })
+};
+
+const ModelLoadRazorpayAndOpenCheckout = () => {
+    if (window.Razorpay) {
+        ModelOpenRazorpayCheckout();
+    } else {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => {
+            ModelOpenRazorpayCheckout();
+        };
+        document.body.appendChild(script);
+    }
+};
+
+const ModelOpenRazorpayCheckout = () => {
+    var rzp = new Razorpay(modelOptions);
+    rzp.open();
+    rzp.on('payment.failed', function (response) {
+        alert('Payment Failed.')
+    })
+};
+
+const payPlan = (id, planAmount) => {
+    planPyamentAmount.value = planAmount;
+    planPyamentProjectId.value = id;
+    planOptions.amount = planAmount * 100;
+
+    axios.post('http://localhost:3000/api/v1/client/create-order/' + planAmount)
+        .then(response => {
+            orderId.value = response.data;
+            loadRazorpayAndOpenCheckout();
+        })
+        .catch(error => {
+            console.error('Error creating order:', error);
+        });
+};
+
+
+const successModelPayment = () => {
+    const url = constants.CLIENT_PAY_MODEL + "/" + modelPaymentProjectId.value;
+    axios.post(url).then((response) => {
+        if (response.status === 200) {
+            modelPaymentProjectId.value = ''
+            modelPaymentAmount.value = ''
+            orderId.value = ''
+            getAllProjects();
+            toast.add({ severity: 'success', summary: 'Model Payment', detail: 'Payment success.', life: 3000 });
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+const successPlanPayment = () => {
+    const url = constants.CLIENT_PAY_PLAN + "/" + planPyamentProjectId.value;
+    axios.post(url).then((response) => {
+        if (response.status === 200) {
+            getAllProjects();
+            planPyamentProjectId.value = ''
+            planPyamentAmount.value = ''
+            orderId.value = ''
+            toast.add({ severity: 'success', summary: 'Plan Payment', detail: 'Payment success.', life: 3000 });
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
 const modelPayment = (id, modelAmount) => {
-    modelPaymentDilog.value = true;
     modelPaymentAmount.value = modelAmount;
     modelPaymentProjectId.value = id;
-    // confirm.require({
-    //     message: 'Are you sure you want to pay?',
-    //     header: 'Dummy 3D Model Payment',
-    //     icon: 'pi pi-exclamation-triangle',
-    //     rejectClass: 'p-button-secondary p-button-outlined',
-    //     rejectLabel: 'Cancel',
-    //     acceptLabel: 'Pay ₹' + modelAmount,
-    //     accept: () => {
-    //         axios.post(constants.CLIENT_PAY_MODEL + "/" + id).then((response) => {
-    //             if (response.status === 200) {
-    //                 getAllProjects();
-    //                 toast.add({ severity: 'success', summary: 'Dummy Payment', detail: 'Payment success.', life: 3000 });
-    //             }
-    //         }).catch((error) => {
-    //             console.error(error);
-    //         });
-    //     },
-    //     reject: () => {
-    //         toast.add({ severity: 'info', summary: 'Dummy payment', detail: 'You have cancelled', life: 3000 });
-    //     }
-    // });
+    modelOptions.amount = modelAmount * 100;
+
+    axios.post('http://localhost:3000/api/v1/client/create-order/' + modelAmount)
+        .then(response => {
+            orderId.value = response.data;
+            ModelLoadRazorpayAndOpenCheckout();
+        })
+        .catch(error => {
+            console.error('Error creating order:', error);
+        });
+
 };
 
 const downloadModelImage = (id) => {
@@ -827,8 +935,8 @@ const downloadReceipt = (id, type) => {
                     <Column :exportable="false" style="">
                         <template #body="slotProps">
                             <Button v-if="slotProps.data.planAmountPaid === true"
-                                @click="downloadReceipt(slotProps.data.id,'PLAN')" icon="pi pi-receipt"
-                                outlined rounded severity="success" />
+                                @click="downloadReceipt(slotProps.data.id, 'PLAN')" icon="pi pi-receipt" outlined
+                                rounded severity="success" />
                         </template>
                     </Column>
                     <Column header="3D model payment" style="min-width:12rem">
@@ -852,8 +960,8 @@ const downloadReceipt = (id, type) => {
                     <Column :exportable="false" style="">
                         <template #body="slotProps">
                             <Button v-if="slotProps.data.threeDModelAmountPaid === true"
-                                @click="downloadReceipt(slotProps.data.id,'3D MODEL')" icon="pi pi-receipt"
-                                outlined rounded severity="success" />
+                                @click="downloadReceipt(slotProps.data.id, '3D MODEL')" icon="pi pi-receipt" outlined
+                                rounded severity="success" />
                         </template>
                     </Column>
                     <Column header="Status" style="min-width:12rem">
@@ -934,8 +1042,8 @@ const downloadReceipt = (id, type) => {
                 </template>
             </Dialog>
 
-            <Dialog v-model:visible="planPaymentDilog" :style="{ width: '450px' }" header="Plan Payment"
-                :modal="true" class="p-fluid">
+            <Dialog v-model:visible="planPaymentDilog" :style="{ width: '450px' }" header="Plan Payment" :modal="true"
+                class="p-fluid">
                 <div class="field">
                     <label for="name">Amount</label>
                     <InputNumber id="name" v-model.trim="planPyamentAmount" disabled="true" />
