@@ -33,6 +33,7 @@ const modelUploadProjectId = ref('');
 const viewModelImage = ref(false);
 const viewPlanImage = ref(false);
 const engineerActive = ref('');
+const siteImages = ref([])
 
 
 
@@ -40,6 +41,16 @@ const getAllJobs = () => {
     axios.get(constants.ENGINEER_JOBS).then((response) => {
         if (response.status === 200) {
             jobs.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+const getAllSiteImages = () => {
+    axios.get("http://localhost:3000/api/v1/engineer/site/image/all").then((response) => {
+        if (response.status === 200) {
+            siteImages.value = response.data;
         }
     }).catch((error) => {
         console.error(error);
@@ -81,6 +92,7 @@ getProfile();
 getAllJobs();
 getAllModelImges();
 getAllPlanImages();
+getAllSiteImages();
 
 
 const clearUpdateProject = () => {
@@ -224,6 +236,15 @@ const items = ref([
                 command: () => {
                     getAllModelImges();
                     changeDataTable('models');
+                }
+            },
+            {
+                label: 'Site Images',
+                icon: 'pi pi-objects-column',
+                badge: computed(() => siteImages.value.length),
+                command: () => {
+                    getAllSiteImages();
+                    changeDataTable('site');
                 }
             }
         ]
@@ -440,6 +461,157 @@ const downloadPlanImage = (id) => {
     });
 };
 
+const siteProgress = ref(false);
+const siteText = ref('')
+const errorSiteText = ref(false);
+const siteId = ref('')
+
+const openSiteProgress = (id) => {
+    siteProgress.value = true;
+    siteId.value = id;
+}
+
+const validateSite = () => {
+    if (siteText.value === null || siteText.value === '') {
+        errorSiteText.value = true;
+        return true;
+    } else errorSiteText.value = false;
+    return false;
+}
+
+const uploadSiteImage = async (event) => {
+
+    if (validateSite()) return;
+
+    let projectId = siteId.value;
+    const file = event.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    axios.post("http://localhost:3000/api/v1/engineer/site/" + projectId + "/" + siteText.value, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    }).then((response) => {
+        if (response.status === 200) {
+            errorSiteText.value = false;
+            siteText.value = '';
+            siteProgress.value = false;
+            getAllSiteImages();
+            toast.add({ severity: 'success', summary: 'Site Image', detail: 'Upload success.', life: 3000 });
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+};
+
+const closeSiteProgress = () => {
+    errorSiteText.value = false;
+    siteText.value = '';
+    siteProgress.value = false;
+}
+
+const timeLine = ref(false)
+const timeLineType = ref('')
+const timeLineDays = ref('1')
+const errorTimeLineType = ref(false)
+const errorTimeLineDays = ref(false);
+const tProjectId = ref('')
+const openTimeLine = (id) => {
+    timeLine.value = true;
+    tProjectId.value = id;
+}
+const closeTimeLine = () => {
+    tProjectId.value = ''
+    timeLineDays.value = '1'
+    timeLineType.value = ''
+    errorTimeLineDays.value = false;
+    errorTimeLineType.value = false;
+    timeLine.value = false;
+}
+
+const validTimeLine = () => {
+    if (timeLineType.value === null || timeLineType.value === '') {
+        errorTimeLineType.value = true;
+        return true;
+    } else errorTimeLineType.value = false;
+
+    if (timeLineDays.value === null || timeLineDays.value === '' || parseInt(timeLineDays.value) <= 0) {
+        errorTimeLineDays.value = true;
+        return true;
+    } else errorTimeLineDays.value = false;
+    return false;
+}
+
+const saveTimeLine = () => {
+    if (validTimeLine()) return;
+    const data = {
+        projectId: tProjectId.value,
+        type: timeLineType.value,
+        days: timeLineDays.value
+    }
+    console.log(data);
+    axios.post("http://localhost:3000/api/v1/client/timeline", data).then((response) => {
+        if (response.status === 200) {
+            // Reset form values or perform other actions
+            tProjectId.value = '';
+            timeLineDays.value = '1';
+            timeLineType.value = '';
+            errorTimeLineDays.value = false;
+            errorTimeLineType.value = false;
+            timeLine.value = false;
+
+            // Show success message
+            toast.add({ severity: 'success', summary: 'Timeline', detail: 'Timeline updated.', life: 3000 });
+        }
+    })
+        .catch((error) => {
+            console.error(error);
+        });
+}
+
+const deleteSiteImages = (id) => {
+    confirm.require({
+        message: 'Are you sure you want to delete site?',
+        header: 'Danger Zone',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Cancel',
+        acceptLabel: 'Delete',
+        rejectClass: 'p-button-secondary p-button-outlined',
+        acceptClass: 'p-button-danger',
+        accept: () => {
+            axios.delete("http://localhost:3000/api/v1/engineer/site/" + id).then((response) => {
+                if (response.status === 200) {
+                    getAllSiteImages();
+                    toast.add({ severity: 'success', summary: 'Delete Site Image', detail: 'Delete success.', life: 3000 });
+                }
+            }).catch((error) => {
+                console.error(error);
+            });
+        },
+        reject: () => {
+            toast.add({ severity: 'info', summary: 'Rejected', detail: 'You have cancelled', life: 3000 });
+        }
+    });
+}
+
+const downloadSiteImage = (id) => {
+    axios.get("http://localhost:3000/api/v1/engineer/download/site/" + id).then((response) => {
+        if (response.status === 200) {
+            getAllSiteImages();
+            var imageUrl = constants.BASE_URL + "/engineer/download/site/" + id;
+            var link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = "model.jpg"
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
 </script>
 
 
@@ -480,53 +652,82 @@ const downloadPlanImage = (id) => {
                     </Column>
                     <Column field="type" header="Type" style="min-width:12rem"></Column>
                     <Column field="architectureStyle" header="Architecture Sytle" style="min-width:12rem"></Column>
-                    <Column field="timeline" header="Timeline" style="min-width:12rem">
+                    <!-- <Column field="timeline" header="Timeline" style="min-width:12rem">
                         <template #body="slotProps">
                             <span>{{ slotProps.data.timeline }} days</span>
                         </template>
-                    </Column>
+                    </Column> -->
                     <Column header="Plan payment" style="min-width:12rem">
                         <template #body="slotProps">
                             <div v-if="slotProps.data.planAmountPaid === true">
-                                <Button label="Upload plan" icon="pi pi-file" severity="success" class=""
+                                <Button label="Plan" icon="pi pi-file" severity="success" class=""
                                     @click="uploadPlanOpen(slotProps.data.id)" />
+                                <Button class="ml-3" v-if="slotProps.data.planAmountPaid === true"
+                                    @click="downloadReceipt(slotProps.data.id, 'PLAN')" icon="pi pi-receipt" outlined
+                                    rounded severity="success" />
                             </div>
                             <div v-else>
                                 <Tag value="PAYMENT PENDING" severity="warning" />
                             </div>
                         </template>
                     </Column>
-                    <Column :exportable="false" style="min-width:8rem">
+                    <!-- <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button v-if="slotProps.data.planAmountPaid === true"
-                                @click="downloadReceipt(slotProps.data.id, 'PLAN')" icon="pi pi-receipt"
-                                outlined rounded severity="success" />
+                                @click="downloadReceipt(slotProps.data.id, 'PLAN')" icon="pi pi-receipt" outlined
+                                rounded severity="success" />
                         </template>
-                    </Column>
+                    </Column> -->
                     <Column header="3D model payment" style="min-width:12rem">
                         <template #body="slotProps">
                             <div v-if="slotProps.data.threeDModelAmountPaid === true">
-                                <Button label="Upload Model" icon="pi pi-file" severity="success" class=""
+                                <Button label="Model" icon="pi pi-file" severity="success" class=""
                                     @click="uploadModelOpen(slotProps.data.id)" />
+
+                                <Button class="ml-3" v-if="slotProps.data.threeDModelAmountPaid === true"
+                                    @click="downloadReceipt(slotProps.data.id, '3D MODEL')" icon="pi pi-receipt"
+                                    outlined rounded severity="success" />
                             </div>
                             <div v-else>
                                 <Tag value="PAYMENT PENDING" severity="warning" />
                             </div>
                         </template>
                     </Column>
-                    <Column :exportable="false" style="min-width:8rem">
+                    <!-- <Column :exportable="false" style="min-width:8rem">
                         <template #body="slotProps">
                             <Button v-if="slotProps.data.threeDModelAmountPaid === true"
-                                @click="downloadReceipt(slotProps.data.id,'3D MODEL')" icon="pi pi-receipt"
-                                outlined rounded severity="success" />
+                                @click="downloadReceipt(slotProps.data.id, '3D MODEL')" icon="pi pi-receipt" outlined
+                                rounded severity="success" />
                         </template>
-                    </Column>
+                    </Column> -->
                     <Column header="Update Amount" style="min-width:12rem">
                         <template #body="slotProps">
-                            <Button :disabled="checkUpdateButtonDisable(slotProps)" label="Update amount"
-                                icon="pi pi-plus" severity="success" class="" @click="openNew(slotProps.data.id)" />
+                            <Button :disabled="checkUpdateButtonDisable(slotProps)" label="Amount" icon="pi pi-plus"
+                                severity="success" class="" @click="openNew(slotProps.data.id)" />
                         </template>
                     </Column>
+                    <Column header="Timeline update" style="min-width:12rem">
+                        <template #body="slotProps">
+                            <Button :disabled="!slotProps.data.planAmountPaid && !slotProps.data.threeDModelAmountPaid"
+                                label="Timeline" icon="pi pi-plus" severity="success" class=""
+                                @click="openTimeLine(slotProps.data.id)" />
+                        </template>
+                    </Column>
+                    <Column header="Site Progress" style="min-width:12rem">
+                        <template #body="slotProps">
+                            <Button :disabled="!slotProps.data.planAmountPaid && !slotProps.data.threeDModelAmountPaid"
+                                label="Progress" icon="pi pi-plus" severity="success" class=""
+                                @click="openSiteProgress(slotProps.data.id)" />
+                        </template>
+                    </Column>
+                    <!-- <Column header="Update Site details" style="min-width:12rem">
+                        <template #body="slotProps">
+                            <div v-if="slotProps.data.planAmountPaid === true">
+                                <Button label="Site Status" icon="pi pi-file" severity="success" class=""
+                                    @click="uploadPlanOpen(slotProps.data.id)" />
+                            </div>
+                        </template>
+                    </Column> -->
                     <template #footer> In total there are {{ jobs ? jobs.length : 0 }} jobs.
                     </template>
                 </DataTable>
@@ -570,6 +771,38 @@ const downloadPlanImage = (id) => {
                 </div>
             </Dialog>
 
+        </div>
+
+        <div class="plans" v-if="dataTable === 'site'">
+            <div class="card">
+                <DataTable :value="siteImages" scrollable scrollHeight="600px">
+                    <Toast />
+                    <ConfirmDialog></ConfirmDialog>
+                    <Column field="projectId" header="Project Id" style="min-width:12rem"></Column>
+                    <Column field="projectName" header="Project Name" style="min-width:12rem"></Column>
+                    <Column field="text" header="Message" style="min-width:12rem"></Column>
+                    <!-- <Column header="Status" style="min-width:12rem">
+                        <template #body="slotProps">
+                            <Tag :value="slotProps.data.status" :severity="planGetSeverity(slotProps.data.status)" />
+                        </template>
+                    </Column>
+                    <Column field="reason" header="Reason" style="min-width:12rem"></Column> -->
+                    <Column :exportable="false" style="min-width:8rem">
+                        <template #body="slotProps">
+                            <Button icon="pi pi-download" outlined rounded severity="success"
+                                @click="downloadSiteImage(slotProps.data.imageId)" />
+                        </template>
+                    </Column>
+                    <Column :exportable="false" style="min-width:8rem">
+                        <template #body="slotProps">
+                            <Button icon="pi pi-trash" outlined rounded severity="danger"
+                                @click="deleteSiteImages(slotProps.data.imageId)" />
+                        </template>
+                    </Column>
+                    <template #footer> In total there are {{ siteImages ? siteImages.length : 0 }} site images.
+                    </template>
+                </DataTable>
+            </div>
         </div>
 
 
@@ -637,6 +870,46 @@ const downloadPlanImage = (id) => {
                 </DataTable>
             </div>
         </div>
+
+
+        <Dialog v-model:visible="timeLine" :style="{ width: '450px' }" header="Update Timeline" :modal="true"
+            class="p-fluid">
+            <div class="field">
+                <label for="name">Timeline Type</label>
+                <InputText id="name" v-model.trim="timeLineType" required="true" autofocus :invalid="errorTimeLineType"
+                    placeholder="flooring, painting etc.." />
+                <small class="p-error" v-if="errorTimeLineType">Invalid Timeline Type</small>
+            </div>
+            <div class="field">
+                <label for="name">Days</label>
+                <InputNumber id="name" v-model.trim="timeLineDays" required="true" autofocus
+                    :invalid="errorTimeLineDays" />
+                <small class="p-error" v-if="errorTimeLineDays">Days must be greater than or equal to
+                    1</small>
+            </div>
+            <template #footer>
+                <Button label="Cancel" icon="pi pi-times" text @click="closeTimeLine" />
+                <Button label="Save" icon="pi pi-check" text @click="saveTimeLine" />
+            </template>
+        </Dialog>
+
+        <Dialog v-model:visible="siteProgress" :style="{ width: '450px' }" header="Update Timeline" :modal="true"
+            class="p-fluid">
+            <div class="field">
+                <label for="name">Site Progress Heading</label>
+                <InputText id="name" v-model.trim="siteText" required="true" autofocus :invalid="errorSiteText"
+                    placeholder="flooring completed etc..." />
+                <small class="p-error" v-if="errorSiteText">Invalid Site Progress Heading</small>
+            </div>
+            <div class="field card flex justify-content-center">
+                <FileUpload mode="basic" name="demo[]" url="/api/upload" accept="image/*" customUpload
+                    @uploader="uploadSiteImage" />
+            </div>
+            <!-- <template #footer>
+                <Button label="Cancel" icon="pi pi-times" text @click="closeTimeLine" />
+                <Button label="Save" icon="pi pi-check" text @click="saveTimeLine" />
+            </template> -->
+        </Dialog>
 
     </div>
 

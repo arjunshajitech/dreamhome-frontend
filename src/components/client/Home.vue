@@ -65,6 +65,8 @@ const planPyamentAmount = ref('')
 const RAZORPAY_ID = "rzp_test_7l9OcqB3d2yZOn"
 const RAZORPAY_BASE_URL = "https://api.razorpay.com/v1"
 const orderId = ref('')
+const allTimeline = ref([])
+const siteImages = ref([])
 
 
 const items = ref([
@@ -100,7 +102,26 @@ const items = ref([
                     getAllModelImges();
                     changeDataTable('models');
                 }
+            },
+            {
+                label: 'Project Timelines',
+                icon: 'pi pi-objects-column',
+                badge: computed(() => allTimeline.value.length),
+                command: () => {
+                    getAllTimeLine();
+                    changeDataTable('timeline');
+                }
+            },
+            {
+                label: 'Site Images',
+                icon: 'pi pi-objects-column',
+                badge: computed(() => siteImages.value.length),
+                command: () => {
+                    getAllSiteImages();
+                    changeDataTable('site');
+                }
             }
+
         ]
     },
     {
@@ -231,6 +252,27 @@ const getAllProjects = () => {
     });
 }
 
+const getAllSiteImages = () => {
+    axios.get("http://localhost:3000/api/v1/client/site/images").then((response) => {
+        if (response.status === 200) {
+            siteImages.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
+
+const getAllTimeLine = () => {
+    axios.get("http://localhost:3000/api/v1/client/timeline").then((response) => {
+        if (response.status === 200) {
+            allTimeline.value = response.data;
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
 const getAllPlanImages = () => {
     axios.get(constants.CLIENT_ALL_PLAN_IMAGES).then((response) => {
         if (response.status === 200) {
@@ -255,6 +297,8 @@ getProfile();
 getAllProjects();
 getAllModelImges();
 getAllPlanImages();
+getAllTimeLine();
+getAllSiteImages();
 
 
 const clearCreateProject = () => {
@@ -864,6 +908,25 @@ const downloadReceipt = (id, type) => {
     });
 }
 
+const downloadSiteImage = (id) => {
+    console.log(id);
+    axios.get(constants.BASE_URL + "/client/download/site/" + id).then((response) => {
+        if (response.status === 200) {
+            getAllSiteImages();
+            var imageUrl = constants.BASE_URL + "/client/download/site/" + id;
+            console.log(imageUrl);
+            var link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = "site.jpg"
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }).catch((error) => {
+        console.error(error);
+    });
+}
+
 </script>
 
 
@@ -1144,6 +1207,26 @@ const downloadReceipt = (id, type) => {
             </Dialog>
         </div>
 
+        <div class="plans" v-if="dataTable === 'site'">
+            <div class="card">
+                <DataTable :value="siteImages" scrollable scrollHeight="600px">
+                    <Toast />
+                    <ConfirmDialog></ConfirmDialog>
+                    <Column field="projectId" header="Project Id" style="min-width:12rem"></Column>
+                    <Column field="projectName" header="Project Name" style="min-width:12rem"></Column>
+                    <Column field="text" header="Message" style="min-width:12rem"></Column>
+                    <Column :exportable="false" style="min-width:8rem">
+                        <template #body="slotProps">
+                            <Button icon="pi pi-download" outlined rounded severity="success"
+                                @click="downloadSiteImage(slotProps.data.imageId)"/>
+                        </template>
+                    </Column>
+                    <template #footer> In total there are {{ siteImages ? siteImages.length : 0 }} site images.
+                    </template>
+                </DataTable>
+            </div>
+        </div>
+
         <div class="plans" v-if="dataTable === 'plans'">
             <div class="card">
                 <DataTable :value="planImages" scrollable scrollHeight="600px">
@@ -1241,6 +1324,21 @@ const downloadReceipt = (id, type) => {
                         </template>
                     </Column>
                     <template #footer> In total there are {{ modelImages ? modelImages.length : 0 }} model images.
+                    </template>
+                </DataTable>
+            </div>
+        </div>
+
+        <div class="plans" v-if="dataTable === 'timeline'">
+            <div class="card">
+                <DataTable :value="allTimeline" scrollable scrollHeight="600px">
+                    <Toast />
+                    <ConfirmDialog></ConfirmDialog>
+                    <Column field="projectId" header="Project Id" style="min-width:12rem"></Column>
+                    <Column field="projectName" header="Project Name" style="min-width:12rem"></Column>
+                    <Column field="type" header="Type" style="min-width:12rem"></Column>
+                    <Column field="days" header="No of Days" style="min-width:12rem"></Column>
+                    <template #footer> In total there are {{ allTimeline ? allTimeline.length : 0 }} timelines.
                     </template>
                 </DataTable>
             </div>
